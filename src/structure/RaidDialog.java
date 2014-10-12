@@ -1,7 +1,5 @@
 package structure;
 
-import java.awt.Button;
-import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -10,12 +8,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
@@ -23,13 +25,10 @@ import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 import com.logicalkip.bitingdeath.exceptions.OutOfBoundsException;
 
-
+//FIXME ^ both Button and JButton, both AWT and swing :/
 
 public class RaidDialog extends JDialog {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8885619271231314595L;
 
 	/**
@@ -53,9 +52,11 @@ public class RaidDialog extends JDialog {
 	private Zone currentChosenRaidZone;
 	
 	/**
-	 * Checking one of those Checkbox means that you want the matching survivor to be in the Raid.
+	 * Checking one of those checkboxes means that you want the matching survivor to be in the Raid.
 	 */
-	private Checkbox []willBePartOfTheTeam;
+	private JCheckBox []willBePartOfTheTeam;
+	
+	private JButton okButton;
 	
 	
 	public RaidDialog (JFrame parent, String title, boolean modal, BitingDeathGame game) {
@@ -67,11 +68,11 @@ public class RaidDialog extends JDialog {
 		this.currentChosenRaidZone = null;
 		this.setResizable(false);
 		this.setVisible(false);
-		this.setSize(480, 700);
+		this.setSize(800, 400);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		this.initComponent();
-		//TODO cocher de base tout ce qui est dans raidSettings (suffit de ne pas r�allouer willBePartOfTheTeam pour conserver les coches ? pb avec le nb de surv qui a pu changer ?)
+		//TODO cocher de base tout ce qui est dans raidSettings (suffit de ne pas réallouer willBePartOfTheTeam pour conserver les coches ? pb avec le nb de surv qui a pu changer ?)
 	}
 	
 	
@@ -85,13 +86,13 @@ public class RaidDialog extends JDialog {
 
 		survivorsPanel.setLayout(new GridBagLayout());
 		
-		this.willBePartOfTheTeam = new Checkbox[this.game.getSurvivors().size()];
+		this.willBePartOfTheTeam = new JCheckBox[this.game.getSurvivors().size()];
 		Iterator<Survivor> iterator = this.game.getSurvivors().iterator();
 		int i = 0;
 		while (iterator.hasNext()) {
 			Survivor currentSurvivor = iterator.next();
 			
-			willBePartOfTheTeam[i] = new Checkbox();
+			willBePartOfTheTeam[i] = new JCheckBox();
 
 			GridBagConstraints constraints;
 
@@ -102,13 +103,20 @@ public class RaidDialog extends JDialog {
 			constraints.gridy = i;
 			constraints.insets= new Insets(0, 10, 0, 10);
 			constraints.anchor = GridBagConstraints.PAGE_START;
-			survivorsPanel.add(new JLabel(currentSurvivor.toString()), constraints);//FIXME positionner la ligne courante � la i�me ligne du gridbag ?
+			survivorsPanel.add(new JLabel(currentSurvivor.toString()), constraints);//FIXME positionner la ligne courante à la ième ligne du gridbag ?
 			
 			// Current checkBox
 			constraints = new GridBagConstraints();
 			constraints.gridx = 1;
 			constraints.gridy = i;
 			survivorsPanel.add(willBePartOfTheTeam[i], constraints);
+			
+			this.willBePartOfTheTeam[i].addChangeListener(new ChangeListener() {
+				@Override
+				public void stateChanged(ChangeEvent e) {
+					updateOkButton();
+				}
+			});
 			
 			i++;
 		}
@@ -130,13 +138,19 @@ public class RaidDialog extends JDialog {
 		
 		for (int x = 0 ; x < this.game.getMap().getWidth() ; x++) {
 			for (int y = 0 ; y < this.game.getMap().getHeight() ; y++) {				
-				Button currentZoneButton = new Button(this.getZoneFromMap(x, y).getName());
+				JButton currentZoneButton = new JButton(this.getZoneFromMap(x, y).getName());
 				GridBagConstraints currentButtonConstraints = new GridBagConstraints();
 				currentButtonConstraints.gridx = x;
 				currentButtonConstraints.gridy = y;
 				currentButtonConstraints.anchor = GridBagConstraints.WEST;
 				
-				final int X = x, Y = y; // because the anonymous method below needs final.
+				final int X = x, Y = y; // Because the anonymous method below needs final.
+				currentZoneButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						updateOkButton();
+					}
+				});
 				currentZoneButton.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -145,6 +159,7 @@ public class RaidDialog extends JDialog {
 					}
 				});
 				
+				
 				mapPanel.add(currentZoneButton, currentButtonConstraints);
 			}
 		}
@@ -152,8 +167,8 @@ public class RaidDialog extends JDialog {
 		/*	OK CANCEL Buttons */		
 		JPanel closeButtonsPanel = new JPanel();
 		
-		JButton okButton = new JButton("Ok");
-		okButton.addActionListener(new ActionListener() {			
+		this.okButton = new JButton("Ok");
+		this.okButton.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				sendData = true;
@@ -161,6 +176,7 @@ public class RaidDialog extends JDialog {
 				setVisible(false);
 			}
 		});
+		this.updateOkButton();
 		
 		
 		
@@ -171,7 +187,7 @@ public class RaidDialog extends JDialog {
 				setVisible(false);
 			}
 		});
-		closeButtonsPanel.add(okButton);
+		closeButtonsPanel.add(this.okButton);
 		closeButtonsPanel.add(cancelButton);
 		
 		
@@ -226,11 +242,27 @@ public class RaidDialog extends JDialog {
 	 * Sets raidSettings to the values picked by the player on the RaidDialog
 	 */
 	private void updateRaidSettings() {
-		LinkedList<Survivor> team = new LinkedList<Survivor>();
+		this.raidSettings = new RaidSettings(this.currentChosenRaidZone, this.getCurrentTeam());
+	}
+	
+	private List<Survivor> getCurrentTeam() {
+		List<Survivor> res = new LinkedList<Survivor>();
 		for (int i = 0 ; i < this.willBePartOfTheTeam.length ; i++) {
-			if (this.willBePartOfTheTeam[i].getState())
-				team.add(game.getSurvivors().get(i));
+			if (this.willBePartOfTheTeam[i].isSelected())
+				res.add(game.getSurvivors().get(i));
 		}
-		this.raidSettings = new RaidSettings(this.currentChosenRaidZone, team);
+		return res;
+	}
+	
+	private boolean correctSettings() {
+		return this.getCurrentTeam().size() > 0 && this.currentChosenRaidZone != null;
+	}
+	
+	private void updateOkButton() {
+		if (correctSettings()) {
+			this.okButton.setEnabled(true);
+		} else {
+			this.okButton.setEnabled(false);
+		}
 	}
 }

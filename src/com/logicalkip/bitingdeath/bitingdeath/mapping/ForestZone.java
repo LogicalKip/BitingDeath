@@ -39,7 +39,7 @@ public class ForestZone extends Zone {
 	 */
 	@Override
 	protected String getRandomName() {
-		return "Forest n�" + (int) (Math.random() * 100);
+		return "Forest n°" + (int) (Math.random() * 100);
 	}
 	
 

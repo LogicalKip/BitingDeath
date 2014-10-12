@@ -9,7 +9,7 @@ package com.logicalkip.bitingdeath.bitingdeath.rules;
 public class Rules {
 				/* CONSTANTS */
 	/**
-	* How many suvrivors in the default team of a new game 
+	* How many survivors in the default team of a new game 
 	*/
 	public static final int NB_SURVIVORS_START_DEFAULT = 3;
 	

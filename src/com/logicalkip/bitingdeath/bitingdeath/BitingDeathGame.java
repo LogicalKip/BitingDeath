@@ -2,6 +2,7 @@ package com.logicalkip.bitingdeath.bitingdeath;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Map;
 import com.logicalkip.bitingdeath.bitingdeath.rules.Rules;
@@ -11,15 +12,16 @@ import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
 
 
 /* 
- * TODO idea list for improving the game : 
+ * TODO idea list to improve the game : 
  * being able to build stuff on zones (barricades, bridges in swamp, towers, etc) 
  * XP on survivor's skills : fight, scavenge,... (100 max)
+ * recruiting, start-alone-mode
  * find a way to be sure that a dying survivor is removed from all lists/var, even a forgotten or not so useful one (leader of survivors, last team used, raids, ...)
  * 		NOTES :
- * 			faire ma classe survlist qui h�rite de list<surv>, qui poss�de en attribut static les survlist ainsi cr��es
- * 			(via new), et une m�thode static qui supprime les surv de toutes les survlist existantes. 
+ * 			faire ma classe survlist qui hérite de list<surv>, qui possède en attribut static les survlist ainsi créées
+ * 			(via new), et une méthode static qui supprime les surv de toutes les survlist existantes. 
  * 			pb : et les variables simples ? et si on renew une liste (dans une autre classe), l'ancienne sera toujours
- * 			dans survlist.attributstatic et continuera d'etre updat�e ? 
+ * 			dans survlist.attributstatic et continuera d'etre updatée ? 
  * 			
  * counting how many times a Zone has been raided
  */
@@ -43,7 +45,7 @@ public class BitingDeathGame {
 	/**
 	 * Alive survivors in the team
 	 */
-	protected LinkedList<Survivor> survivors;
+	protected List<Survivor> survivors;
 	
 	/**
 	 * Day 0, Day 1, ... since the beginning of the game
@@ -69,7 +71,7 @@ public class BitingDeathGame {
 	 * The messages that must be displayed to the player. Ex : "X died during a mission", "X has gone because no food left", etc...
 	 * They must be displayed in fifo order, and then removed from the list.
 	 */
-	protected LinkedList<String> messagesToDisplay;
+	protected List<String> messagesToDisplay;
 	
 	/**
 	 * The map of the game, made of different Zones
@@ -95,12 +97,12 @@ public class BitingDeathGame {
 		this.currentRaidSettings = null;
 	}
 
-	
+	//TODO prevent same-name survivors from existing
 	/**
 	 * Returns a new list of N random survivors, N being defined in this.rules
 	 */
-	protected LinkedList<Survivor> getRandomSurvivorList() {
-		LinkedList<Survivor> survivors = new LinkedList<Survivor>();
+	protected List<Survivor> getRandomSurvivorList() {
+		List<Survivor> survivors = new LinkedList<Survivor>();
 		for (int i = 0 ; i < this.rules.getNbSurvivorsStart() ; i++)
 			survivors.add(new Survivor());
 		return survivors;
@@ -108,8 +110,9 @@ public class BitingDeathGame {
 	
 	/**
 	 * When the player ends the current day.
+	 * @throws CantRunRaidException 
 	 */
-	public void nextDay() {
+	public void nextDay() throws CantRunRaidException {
 		if (this.currentRaidSettings != null)
 			this.runRaid(this.currentRaidSettings);
 		
@@ -139,16 +142,15 @@ public class BitingDeathGame {
 	/**
 	 * Run a raid with raidSettings and add found rations to current owned ones.
 	 * Dead survivors will be removed from the list and added as zombies in the raided Zone.
-	 * @param raidSettings Must already be created and initialised : team, etc.
+	 * @param raidSettings Must already be created and initialized : team, etc.
+	 * @throws CantRunRaidException 
 	 */
-	private void runRaid(RaidSettings raidSettings) {
+	private void runRaid(RaidSettings raidSettings) throws CantRunRaidException {
 		Raid raid = new Raid(raidSettings);
 		
-		try {
-			raid.run();
-		} catch (CantRunRaidException e1) {
-			e1.printStackTrace();
-		}
+		
+		raid.run();
+		
 		
 		this.messagesToDisplay.addAll(raid.getMessagesToDisplayOnceRaidIsOver());
 		LinkedList<Survivor> deadSurvivors = raid.getSurvivorsHurtDuringRaid();
@@ -156,16 +158,15 @@ public class BitingDeathGame {
 		try {
 			raid.getDestination().addZombies(deadSurvivors.size());
 		} catch (IncoherentNumberException e) {
-			System.err.println("Erreur de code dans BitingDeathGame/runRaid : le nombre de zombies � ajouter est incoh�rent");
+			System.err.println("Erreur de code dans BitingDeathGame/runRaid : le nombre de zombies à ajouter est incohérent");
 			e.printStackTrace();
 		}
 		
 		Iterator<Survivor> iter = deadSurvivors.iterator();
 		
-		while (iter.hasNext()) { // Removing dead survivors from the game list and the raid list
+		while (iter.hasNext()) { // Removing dead survivors from the game
 			Survivor nextHurtSurvivor = iter.next();
-			this.survivors.remove(nextHurtSurvivor); //TODO change when found a way to update all lists as s1 dies. 
-			raid.removeSurvivor(nextHurtSurvivor);
+			this.removeSurvivorFromGame(nextHurtSurvivor);
 		}
 		
 		this.rations += raid.getLoot();
@@ -181,8 +182,7 @@ public class BitingDeathGame {
 	}
 	
 	/**
-	 * Return true if the fifo list of messages-to-display-to-the-user is not empty
-	 * @return
+	 * @return Return true if the fifo list of messages-to-display-to-the-user is not empty
 	 */
 	public boolean thereAreMessagesToDisplay() {
 		return ! this.messagesToDisplay.isEmpty();
@@ -193,15 +193,25 @@ public class BitingDeathGame {
 	 * @return the first message of the current list of messages to display, or null if the list is empty
 	 */
 	public String getNextMessageToDisplay() {
-		if (this.thereAreMessagesToDisplay())
-		{
-			String nextMsg = this.messagesToDisplay.getFirst();
-			this.messagesToDisplay.removeFirst();
-			return nextMsg;
+		String res = null;
+		if (this.thereAreMessagesToDisplay()) {
+			res = this.messagesToDisplay.get(0); // First
+			this.messagesToDisplay.remove(0);
 		}
-		else
-			return null;
+		return res;
 	}
+	
+	/**
+	 * TODO Constant checking : when adding another Survivor container (list, attribute, etc), make sure this method will remove it (or set to null when an attribute) too.
+	 * Remove a survivor (presumably when dead) from all lists referencing him and sets all attributes pointing it to null
+	 * @param s The survivor to remove
+	 */
+	private void removeSurvivorFromGame(Survivor s) {
+		this.survivors.remove(s);
+		this.currentRaidSettings.team.remove(s);
+	}
+	
+	//TODO LinkedList->List
 	
 				/* GETTERS | SETTERS */
 	
@@ -269,5 +279,9 @@ public class BitingDeathGame {
 	 */
 	public void setCurrentRaidSettings(RaidSettings currentRaidSettings) {
 		this.currentRaidSettings = currentRaidSettings;
+	}
+
+	public int getRations() {
+		return rations;
 	}	
 }

@@ -3,11 +3,11 @@ package com.logicalkip.bitingdeath.bitingdeath.survivor;
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 
 /**
- * Survivor skills. They improve when used, up to 100, and represent how skilled a survivor is
+ * Survivor skills. They improve when used, up to Skills.LEVEL_MAX,
+ * and represent how skilled a survivor is
  * in a field : fighting, scavenging, etc.
  * Every survivor has its own Skills.
  * @author LogicalKip
- *
  */
 public class Skills {
 	
@@ -21,8 +21,7 @@ public class Skills {
 	 * Every skill is between LEVEL_MAX and this.
 	 * The worse skill level imaginable would be LEVEL_MIN.
 	 */
-	public final static int LEVEL_MIN = 0;
-	//FIXME prob with level 0 x stg ?
+	public final static int LEVEL_MIN = 1;
 	
 	/**
 	 * No survivor will start the game being worse than STARTING_MIN_LEVEL.
@@ -44,7 +43,7 @@ public class Skills {
 	
 	public Skills () {
 		this.fightingSkill = Skills.getRandomStartingLevel();
-		this.fightingSkill = Skills.getRandomStartingLevel();
+		this.scavengingSkill = Skills.getRandomStartingLevel();
 	}
 	
 	

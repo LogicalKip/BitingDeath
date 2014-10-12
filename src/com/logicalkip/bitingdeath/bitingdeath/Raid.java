@@ -34,7 +34,7 @@ public class Raid {
 	 * Ex : "John was bitten", "Nothing was found".
 	 */
 	protected LinkedList<String> messagesToDisplayOnceRaidIsOver;
-	
+	//TODO ctrlF LinkedList
 	/**
 	 * Sublist of this.team, it contains survivors that were hurt (killed ?) last time running the raid.
 	 * This is purely informative, and those in this list can definitely still be in this.team
@@ -87,7 +87,9 @@ public class Raid {
 			throw new CantRunRaidException(CantRunRaidBecause.NO_SURVIVORS);
 		
 		
-		int lootFound = 0, zombiesKilled = 0, zombiesRoamingTheZone = this.raidSettings.getDestination().getZombiesLeft(), nbOfSurvivorsAtFirst = this.raidSettings.getTeam().size();
+		int lootFound = 0, zombiesKilled = 0, 
+				zombiesRoamingTheZone = this.raidSettings.getDestination().getZombiesLeft(), 
+				nbOfSurvivorsAtFirst = this.raidSettings.getTeam().size();
 		double rand;
 		
 		Iterator<Survivor> iter = this.raidSettings.getTeam().iterator();
@@ -98,14 +100,11 @@ public class Raid {
 		//TODO looting before or after killing zombies (% danger) ? 
 		while (iter.hasNext()) {
 			Survivor currentSurvivor = iter.next();
-			if (BitingDeathGame.getRandomProbability() > chancesOfSurvivingTheRaid(currentSurvivor, zombiesRoamingTheZone))
-			{// Too bad.
+			if (BitingDeathGame.getRandomProbability() > chancesOfSurvivingTheRaid(currentSurvivor, zombiesRoamingTheZone)) {
+				// Too bad.
 				this.survivorsHurtDuringRaid.add(currentSurvivor);
 				this.messagesToDisplayOnceRaidIsOver.add(currentSurvivor.getName() + " has been bitten while running the raid");
-			}
-			
-			else // Still alive, may proceed to scavenging
-			{
+			} else {// Still alive, may proceed to scavenging
 				rand = BitingDeathGame.getRandomProbability();
 				if (rand > 0.75)
 					lootFound += 2;
@@ -119,23 +118,23 @@ public class Raid {
 		if (lootFound == 0)
 			this.messagesToDisplayOnceRaidIsOver.add("Nothing interesting was brought back from " + this.raidSettings.getDestination().getName());
 		
-		// Batching some Zeds, even hurt survivors did.
+		// Bashing some Zeds, even hurt survivors did.
 		if (nbOfSurvivorsAtFirst > zombiesRoamingTheZone)
 			zombiesKilled = zombiesRoamingTheZone;
 		else
 			zombiesKilled = nbOfSurvivorsAtFirst;
 
-		if (zombiesKilled > 0)
-		{			
-			if (zombiesKilled == 1)
-				this.messagesToDisplayOnceRaidIsOver.add("One unlucky zombie was killed");
-			else 
-				this.messagesToDisplayOnceRaidIsOver.add(zombiesKilled + " zombies have been killed");
+		if (zombiesRoamingTheZone == 0)
+			this.messagesToDisplayOnceRaidIsOver.add("No zombies were encoutered");
+		else if (zombiesKilled == 1)
+			this.messagesToDisplayOnceRaidIsOver.add("One unlucky zombie was killed");
+		else 
+			this.messagesToDisplayOnceRaidIsOver.add(zombiesKilled + " zombies have been killed");
 			
 			iter = this.raidSettings.getTeam().iterator();
 			while(iter.hasNext())
 				iter.next().improveFightingSkill();
-		}
+		
 		
 		try {
 			this.raidSettings.getDestination().removeZombies(zombiesKilled);
@@ -198,10 +197,7 @@ public class Raid {
 		return this.loot;
 	}
 	
-	
-	/**
-	 * Regular toString method
-	 */
+	@Override
 	public String toString() {
 		String res = "";
 		res += this.raidSettings.getTeam().size() + " survivors : \n";

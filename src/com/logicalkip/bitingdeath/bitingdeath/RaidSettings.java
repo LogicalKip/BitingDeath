@@ -1,14 +1,15 @@
 package com.logicalkip.bitingdeath.bitingdeath;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 
 /**
+ * Showing WHOM the player decided will go WHERE.
+ * Could possibly be saved and used to run several Raid (as a "favorite")
  * @author LogicalKip
- * Showing WHO the player decided will go WHERE 
- * Could possibily be saved and used to run several Raid (as a "favourite")
  */
 public class RaidSettings {
 	/**
@@ -19,10 +20,10 @@ public class RaidSettings {
 	/**
 	 * Survivors running the mission
 	 */
-	protected LinkedList<Survivor> team;
+	protected List<Survivor> team;
 	
 	
-	public RaidSettings(Zone destination, LinkedList<Survivor> team) {
+	public RaidSettings(Zone destination, List<Survivor> team) {
 		this.destination = destination;
 		
 		
@@ -52,7 +53,7 @@ public class RaidSettings {
 	/**
 	 * @return the team
 	 */
-	public LinkedList<Survivor> getTeam() {
+	public List<Survivor> getTeam() {
 		return this.team;
 	}
 
@@ -63,5 +64,11 @@ public class RaidSettings {
 		this.team = team;
 	}
 	
-	
+	@Override
+	public String toString() {
+		String res = "";
+		res += "Destination : " + this.destination.getName() + "\n";
+		res += "Team : " + this.team.toString();
+		return res;
+	}
 }

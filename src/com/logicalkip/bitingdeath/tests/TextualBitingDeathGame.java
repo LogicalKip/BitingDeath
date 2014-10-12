@@ -39,7 +39,7 @@ public class TextualBitingDeathGame extends BitingDeathGame {
 	}
 	
 	public void removeFirstSurvivor() {
-		this.survivors.removeFirst();
+		this.survivors.remove(0);
 	}
 	
 }

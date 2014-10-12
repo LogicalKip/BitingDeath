@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
+import com.logicalkip.bitingdeath.exceptions.CantRunRaidException;
 import com.logicalkip.bitingdeath.exceptions.OutOfBoundsException;
 
 /**
@@ -49,25 +50,35 @@ public class BitingDeathGameTests {
 
 		raid = new RaidSettings(zone0, game.getSurvivors());
 
-		System.out.println("\n\nRAID AT FIRST: " + raid + "\nAt first, "
+		System.out.println("\n\nRAID AT FIRST :\n" + raid + "\nAt first, "
 				+ zone0.getZombiesLeft() + " zombies left\n");
 
 		while (!game.getGameOver()) {
 			System.out.println(game.getInventory());
 			
 			game.setCurrentRaidSettings(raid);
-			System.out.println("\nRunning the raid...");
+
 
 //			System.out.println("\n\nRAID : " + raid + "\nStill "
 //					+ zone0.getZombiesLeft() + " zombies left\n");
 
+			
+
+			System.out.println("\nRunning the raid...");
+			try {
+				game.nextDay();
+			} catch (CantRunRaidException e) {
+				e.printStackTrace();
+			}
+			
+			// Morning
 			String msg = game.getNextMessageToDisplay();
 			while (msg != null) {
 				System.out.println(msg);
 				msg = game.getNextMessageToDisplay();
 			}
+			
 			System.out.println("\nSurvivors still alive : " + game.getSurvivors().size() + "\n");
-			game.nextDay();
 		}
 
 		System.out.println(game.getGameOverMessage());

@@ -39,7 +39,7 @@ public class PlainZone extends Zone {
 	 */
 	@Override
 	protected String getRandomName() {
-		return "Plain n�" + (int) (Math.random() * 100);
+		return "Plain n°" + (int) (Math.random() * 100);
 	}
 
 }
