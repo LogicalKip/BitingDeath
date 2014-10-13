@@ -120,6 +120,11 @@ public abstract class Zone {
 		return this.kindOfZone;
 	}
 	
+	@Override
+	public String toString() {
+		return this.name;
+	}
+	
 
 	
 }

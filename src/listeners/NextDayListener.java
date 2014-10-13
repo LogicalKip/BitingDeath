@@ -37,10 +37,7 @@ public class NextDayListener implements ActionListener {
 		try {
 			this.game.nextDay();
 			this.frame.updateAll();
-			while (game.thereAreMessagesToDisplay()) {
-				JOptionPane.showMessageDialog(null, this.game.getNextMessageToDisplay(), 
-						"Information", JOptionPane.INFORMATION_MESSAGE);
-			}
+			this.frame.showAllMessages();
 		} catch (CantRunRaidException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

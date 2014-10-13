@@ -5,15 +5,11 @@ import java.awt.MenuBar;
 
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 
-public class BitingDeathMenu extends MenuBar {
+public class BitingDeathMenuBar extends MenuBar {
 
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4170679580271387715L;
 	
-	public BitingDeathMenu(BitingDeathGame game) {
+	public BitingDeathMenuBar(BitingDeathGame game, BitingDeathFrame frame) {
 		super();
 		
 		Menu menu1 = new Menu("UNDEFINED");
@@ -21,7 +17,7 @@ public class BitingDeathMenu extends MenuBar {
 
 		
 		this.add(menu1);
-		this.add(new RaidMenu(game));
+		this.add(new RaidMenu(game, frame));
 		
 	}
 

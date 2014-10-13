@@ -3,6 +3,7 @@ package listeners;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import structure.BitingDeathFrame;
 import structure.RaidDialog;
 
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
@@ -17,8 +18,11 @@ public class SetRaidListener implements ActionListener {
 	
 	private BitingDeathGame game;
 	
-	public SetRaidListener(BitingDeathGame g) {
+	private BitingDeathFrame frame;
+	
+	public SetRaidListener(BitingDeathGame g, BitingDeathFrame f) {
 		this.game = g;
+		this.frame = f;
 	}
 	
 	@Override
@@ -29,6 +33,7 @@ public class SetRaidListener implements ActionListener {
 		if (raidSettings != null) {
 			this.game.setCurrentRaidSettings(raidSettings);
 		}
+		this.frame.updateAll();
 	}
 
 }
