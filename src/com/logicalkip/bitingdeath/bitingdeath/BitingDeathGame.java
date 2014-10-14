@@ -153,7 +153,7 @@ public class BitingDeathGame {
 		
 		
 		this.messagesToDisplay.addAll(raid.getMessagesToDisplayOnceRaidIsOver());
-		LinkedList<Survivor> deadSurvivors = raid.getSurvivorsHurtDuringRaid();
+		List<Survivor> deadSurvivors = raid.getSurvivorsHurtDuringRaid();
 		
 		try {
 			raid.getDestination().addZombies(deadSurvivors.size());
@@ -211,7 +211,6 @@ public class BitingDeathGame {
 		this.currentRaidSettings.team.remove(s);
 	}
 	
-	//TODO LinkedList->List
 	
 				/* GETTERS | SETTERS */
 	
@@ -254,7 +253,7 @@ public class BitingDeathGame {
 	 * @return the survivors. Not the very list of survivors owned by the game, but a list (copy)
 	 * with those survivors.
 	 */
-	public LinkedList<Survivor> getSurvivors() {
+	public List<Survivor> getSurvivors() {
 		return new LinkedList<Survivor>(this.survivors);
 	}
 

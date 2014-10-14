@@ -24,7 +24,7 @@ import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 public class BitingDeathFrame extends JFrame {
 
 	/* 
-	 * TODO : preferences, new game, display survivor lists (raid+all), next day, messages/next message, see map, 
+	 * TODO : preferences, new game, display survivor lists (raid+all), messages/next message, see map, 
 	 * Handle Game over
      */ 
 	
@@ -108,7 +108,7 @@ public class BitingDeathFrame extends JFrame {
 		if (raidSettings == null) {
 			raidText = "You have not set any raid for today";
 		} else if (raidSettings.getTeam().size() == 0) {
-			raidText = "Select some survivors to run the raid";
+			raidText = "No survivors selected to run the raid";
 		}  else {
 			raidText = "You will raid : " + raidSettings.getDestination() + "\nwith :";
 			for (Survivor s : raidSettings.getTeam()) {

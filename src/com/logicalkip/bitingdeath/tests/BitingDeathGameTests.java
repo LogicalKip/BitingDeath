@@ -1,6 +1,6 @@
 package com.logicalkip.bitingdeath.tests;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
@@ -18,7 +18,7 @@ import com.logicalkip.bitingdeath.exceptions.OutOfBoundsException;
 public class BitingDeathGameTests {
 
 	public static void getSurvivorsTest(TextualBitingDeathGame game) {
-		LinkedList<Survivor> team = game.getSurvivors();
+		List<Survivor> team = game.getSurvivors();
 		System.out.println(team);
 		System.out.println(game.getSurvivorListToString());
 

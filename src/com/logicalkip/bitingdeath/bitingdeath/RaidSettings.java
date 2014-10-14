@@ -60,7 +60,7 @@ public class RaidSettings {
 	/**
 	 * @param team the team to set
 	 */
-	public void setTeam(LinkedList<Survivor> team) {
+	public void setTeam(List<Survivor> team) {
 		this.team = team;
 	}
 	

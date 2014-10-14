@@ -2,6 +2,7 @@ package com.logicalkip.bitingdeath.bitingdeath;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
@@ -33,13 +34,13 @@ public class Raid {
 	 * Those messages shall be added to the ones in BitingDeathGame, and displayed somehow/when after the raid
 	 * Ex : "John was bitten", "Nothing was found".
 	 */
-	protected LinkedList<String> messagesToDisplayOnceRaidIsOver;
-	//TODO ctrlF LinkedList
+	protected List<String> messagesToDisplayOnceRaidIsOver;
+
 	/**
 	 * Sublist of this.team, it contains survivors that were hurt (killed ?) last time running the raid.
 	 * This is purely informative, and those in this list can definitely still be in this.team
 	 */
-	protected LinkedList<Survivor> survivorsHurtDuringRaid;
+	protected List<Survivor> survivorsHurtDuringRaid;
 	
 				/* METHODS */
 	
@@ -55,11 +56,12 @@ public class Raid {
 	 * CONSTRUCTOR
 	 * @param team Create a new empty team if null
 	 */
-	public Raid(LinkedList<Survivor> team, Zone zoneDest) {
+	public Raid(List<Survivor> team, Zone zoneDest) {
 		this(new RaidSettings(zoneDest, team));
 	}
 	
 	/**
+	 * CONSTRUCTOR
 	 * @param raidSettings2
 	 */
 	public Raid(RaidSettings raidSettings) {
@@ -211,14 +213,14 @@ public class Raid {
 	/**
 	 * @return the survivorsHurtDuringRaid
 	 */
-	public LinkedList<Survivor> getSurvivorsHurtDuringRaid() {
+	public List<Survivor> getSurvivorsHurtDuringRaid() {
 		return this.survivorsHurtDuringRaid;
 	}
 
 	/**
 	 * @return the messagesToDisplayOnceRaidIsOver
 	 */
-	public LinkedList<String> getMessagesToDisplayOnceRaidIsOver() {
+	public List<String> getMessagesToDisplayOnceRaidIsOver() {
 		return this.messagesToDisplayOnceRaidIsOver;
 	}
 

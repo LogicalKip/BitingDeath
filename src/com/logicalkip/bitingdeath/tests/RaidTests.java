@@ -1,6 +1,7 @@
 package com.logicalkip.bitingdeath.tests;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import com.logicalkip.bitingdeath.bitingdeath.Raid;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.ForestZone;
@@ -16,7 +17,7 @@ import com.logicalkip.bitingdeath.exceptions.CantRunRaidException;
 public class RaidTests {
 
 	public static void main(String[] args) {
-		LinkedList<Survivor> survivors = new LinkedList<Survivor>();
+		List<Survivor> survivors = new LinkedList<Survivor>();
 		for (int i = 0 ; i < Rules.NB_SURVIVORS_START_DEFAULT ; i++)
 			survivors.add(new Survivor());
 			
