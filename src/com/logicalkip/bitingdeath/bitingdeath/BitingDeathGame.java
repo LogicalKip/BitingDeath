@@ -14,6 +14,7 @@ import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
 /* 
  * TODO idea list to improve the game : 
  * being able to build stuff on zones (barricades, bridges in swamp, towers, etc) 
+ * several raids at once
  * XP on survivor's skills : fight, scavenge,... (100 max)
  * recruiting, start-alone-mode
  * find a way to be sure that a dying survivor is removed from all lists/var, even a forgotten or not so useful one (leader of survivors, last team used, raids, ...)

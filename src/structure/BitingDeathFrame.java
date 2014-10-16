@@ -1,13 +1,14 @@
 package structure;
 
-import java.awt.FlowLayout;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
 
 import listeners.NextDayListener;
 import listeners.SetRaidListener;
@@ -36,6 +37,8 @@ public class BitingDeathFrame extends JFrame {
 	
 	private JTextArea currentRaidSettingsText;
 	
+	private JTextArea survivorInfoText;
+	
 	private JButton nextDayButton;
 	
 	private JButton raidButton;
@@ -46,41 +49,71 @@ public class BitingDeathFrame extends JFrame {
 	 */
 	public BitingDeathFrame(BitingDeathGame newGame) {
 		super();
-		this.setSize(800, 600);
+		this.setSize(500, 300);
 		
 		this.game = newGame;
 
 		this.setTitle("Biting Death");
 		this.setLocationRelativeTo(null);
 		this.setMenuBar(new BitingDeathMenuBar(game, this));
+
+
+		Container pane = this.getContentPane();
+
+		pane.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+
+		//natural height, maximum width
+		c.fill = GridBagConstraints.HORIZONTAL;
+
+		this.foodLabel = new JLabel();
+		c.weightx = 0.5;
+		c.weighty = 1;
+		c.fill = GridBagConstraints.NONE;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.anchor = GridBagConstraints.NORTH;
+		pane.add(this.foodLabel, c);
 		
 		
-	    this.foodLabel = new JLabel();
-	    this.foodLabel.setHorizontalAlignment(SwingConstants.LEFT);
-	    this.foodLabel.setVerticalAlignment(SwingConstants.BOTTOM);
-	    
+		this.raidButton = new JButton("Set a raid");
+		c.gridx = 1;
+		pane.add(this.raidButton, c);
+
+		this.nextDayButton = new JButton("Next day");
+		c.gridx = 2;
+		pane.add(this.nextDayButton, c);
+
 	    this.currentRaidSettingsText = new JTextArea();
 	    this.currentRaidSettingsText.setEditable(false);
 	    this.currentRaidSettingsText.setCursor(null);  
 	    this.currentRaidSettingsText.setOpaque(false);  
 	    this.currentRaidSettingsText.setFocusable(false);
-	    //FIXME Horizontal/vertical alignment
-		
-		this.raidButton = new JButton("Set a raid");
-		this.nextDayButton = new JButton("Next day");
-		this.getContentPane().setLayout(new FlowLayout());
-	    this.getContentPane().add(this.raidButton);
-	    this.getContentPane().add(this.nextDayButton);
-	    this.getContentPane().add(this.foodLabel);
-	    this.getContentPane().add(this.currentRaidSettingsText);
+	    c.gridy = 1;
+	    c.gridx = 1;
+	    c.gridwidth = 2;
+	    c.weighty = 1;
+	    c.weightx = 1;
+	    pane.add(this.currentRaidSettingsText, c);
 	    
+	    this.survivorInfoText = new JTextArea();
+	    this.survivorInfoText.setEditable(false);
+	    this.survivorInfoText.setCursor(null);  
+	    this.survivorInfoText.setOpaque(false);  
+	    this.survivorInfoText.setFocusable(false);
+	    c.gridy = 1;
+	    c.gridx = 0;
+	    c.gridwidth = 1;
+	    c.weighty = 1;
+	    pane.add(this.survivorInfoText, c);
 
-	    
 	    this.raidButton.addActionListener(new SetRaidListener(this.game, this));
 	    this.nextDayButton.addActionListener(new NextDayListener(this.game, this));
+
 	    
-	    this.updateDisplayedData();
-	    
+	    this.updateAll();
+		
+		
 		this.setVisible(true);
 		
 		this.showAllMessages();
@@ -101,6 +134,13 @@ public class BitingDeathFrame extends JFrame {
 	
 	public void updateDisplayedData() {
 		this.foodLabel.setText("Rations left : " + this.game.getRations());
+		
+		// Survivor info
+		String survText = "Survivors :\n";;
+		for (Survivor s : this.game.getSurvivors()) {
+			survText += "   " + s.toString() + "\n";
+		}
+		this.survivorInfoText.setText(survText);
 		
 		// Raid info
 		RaidSettings raidSettings = this.game.getCurrentRaidSettings();
