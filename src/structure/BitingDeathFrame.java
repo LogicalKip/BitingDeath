@@ -125,7 +125,8 @@ public class BitingDeathFrame extends JFrame {
 		
 		// Updating UI
 		if (this.game.getCurrentRaidSettings() == null || 
-			this.game.getCurrentRaidSettings().getTeam().size() == 0) {  //FIXME or no destination provided... ?
+			this.game.getCurrentRaidSettings().getTeam().size() == 0 ||
+			this.game.getCurrentRaidSettings().getDestination() == null) {
 			this.nextDayButton.setEnabled(false);
 		} else {
 			this.nextDayButton.setEnabled(true);
@@ -148,7 +149,7 @@ public class BitingDeathFrame extends JFrame {
 		if (raidSettings == null) {
 			raidText = "You have not set any raid for today";
 		} else if (raidSettings.getTeam().size() == 0) {
-			raidText = "No survivors selected to run the raid";
+			raidText = "No survivors selected to run the raid in " + raidSettings.getDestination();
 		}  else {
 			raidText = "You will raid : " + raidSettings.getDestination() + "\nwith :";
 			for (Survivor s : raidSettings.getTeam()) {

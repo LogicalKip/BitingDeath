@@ -1,5 +1,8 @@
 package com.logicalkip.bitingdeath.bitingdeath.survivor;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 
 /**
@@ -18,15 +21,13 @@ public class Survivor {
 				/* ATTRIBUTES */
 	/**
 	 * ID of the survivor. There must NOT be twice the same ID among survivors (whether dead or alive),
-	 * as it is used to differenciate them.
-	 * 
-	 * Will also be used for creating names. Ex : AnonymousSurvivor_0, AnonymousSurvivor_1, ... 
+	 * as it is used to differentiate them.
 	 */
 	protected final int id;
 	
 	
 	/**
-	 * Name of the survivor. Several survivors may share the same name, so use id rather to distinguish them.
+	 * Name of the survivor.
 	 */
 	protected String name;
 	
@@ -45,8 +46,8 @@ public class Survivor {
 	 * CONSTRUCTOR
 	 * Gives a random name to the survivor.
 	 */
-	public Survivor() {		
-		this(null);
+	public Survivor() {		//TODO improve constructors hierarchy, understanding, etc.
+		this("");
 	}
 	
 	/**
@@ -54,32 +55,55 @@ public class Survivor {
 	 * @param newName the name the survivor will be named after, or a random one if invalid.
 	 */
 	public Survivor(String newName) {
+		this(new LinkedList<String>());
+		
+		if (newName != null && !newName.equals(""))
+			this.name = newName;
+	}
+	
+	/**
+	 * CONSTRUCTOR
+	 * @param namesNotToUse The name of the survivor will not be any of namesNotToUse's items
+	 */
+	public Survivor(Collection<String> namesNotToUse) {
 		Survivor.survivorsCreated++;
 		this.id = Survivor.survivorsCreated;
 		this.isFemale = (BitingDeathGame.getRandomProbability() > 0.5);
-		if (newName == null || newName.equals(""))
-			this.name = Survivor.getRandomName(this.isFemale);
-		else
-			this.name = newName;
-		this.skills = new Skills();		
+		this.skills = new Skills();	
+		
+		this.name = getRandomUnusedName(namesNotToUse, this.isFemale);
+		
+	
+	}
+	
+	/**
+	 * /!\ FIXME Will loop indefinitely if all name combinations already exist in usedNames (=> many survivors)
+	 * @param usedNames
+	 * @param femaleName
+	 * @return A random name not included in usedNames
+	 */
+	public String getRandomUnusedName(Collection<String> usedNames, boolean femaleName) {
+		String name = Survivor.getRandomName(femaleName);
+		while (usedNames.contains(name)) {
+			name = Survivor.getRandomName(femaleName);
+		}
+		return name;
 	}
 	
 	/**
 	 * A random name, composed of a first name and a surname. Ex : "John Kennedy"
 	 * Might return an already used name.
-	 * @return a random name, depending on the survivor's sex, given in the parameter
+	 * See also {@link Survivor#getRandomUnusedName(Collection, boolean)}
+	 * @return a random name, depending on the survivor's sex, given as a parameter
 	 */
 	protected static String getRandomName(boolean femaleName) {
-		String maleFirstNames[] = 	
-			{	
+		String maleFirstNames[] = 	{	
 				"John", "Peter", "Jack", "Charles", "Philip", "Luke", "Victor", "Stefan", "Mike", "Glenn"
 			};
-		String femaleFirstNames[] = 
-			{	
+		String femaleFirstNames[] = {	
 				"Sofia", "Judy", "Lois", "Jenny", "Melissa", "Eve", "Evelyn", "Angelina", "Lisa", "Amy"
 			};
-		String surnames[] = 	
-			{	
+		String surnames[] = {	
 				"Kennedy", "Black", "White", "Field", "Chesterblutch", "Conway", "Reminger", 
 				"Coldsnow", "Hazelnut", "Starbringer", "Griffin"
 			};
@@ -102,7 +126,7 @@ public class Survivor {
 	 * @return true if the id are the same
 	 */
 	protected boolean equals(Survivor otherSurvivor) {
-		return this.id == otherSurvivor.id;
+		return otherSurvivor != null && this.id == otherSurvivor.id;
 	}
 	
 				/* GETTERS | SETTERS */

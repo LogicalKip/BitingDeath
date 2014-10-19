@@ -66,7 +66,7 @@ public class RaidDialog extends JDialog {
 		this.raidSettings = new RaidSettings(null, null);
 		this.sendData = false;
 		this.currentChosenRaidZone = null;
-		this.setResizable(false);
+		this.setResizable(true);
 		this.setVisible(false);
 		this.setSize(800, 400);
 		this.setLocationRelativeTo(null);
@@ -103,7 +103,7 @@ public class RaidDialog extends JDialog {
 			constraints.gridy = i;
 			constraints.insets= new Insets(0, 10, 0, 10);
 			constraints.anchor = GridBagConstraints.PAGE_START;
-			survivorsPanel.add(new JLabel(currentSurvivor.toString()), constraints);//FIXME positionner la ligne courante à la ième ligne du gridbag ?
+			survivorsPanel.add(new JLabel(currentSurvivor.toString()), constraints);
 			
 			// Current checkBox
 			constraints = new GridBagConstraints();

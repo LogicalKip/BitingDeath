@@ -11,7 +11,7 @@ public class Rules {
 	/**
 	* How many survivors in the default team of a new game 
 	*/
-	public static final int NB_SURVIVORS_START_DEFAULT = 3;
+	public static final int NB_SURVIVORS_START_DEFAULT = 5;
 	
 	/**
 	* How many rations do you begin a game with

@@ -103,11 +103,17 @@ public class BitingDeathGame {
 	 * Returns a new list of N random survivors, N being defined in this.rules
 	 */
 	protected List<Survivor> getRandomSurvivorList() {
-		List<Survivor> survivors = new LinkedList<Survivor>();
-		for (int i = 0 ; i < this.rules.getNbSurvivorsStart() ; i++)
-			survivors.add(new Survivor());
-		return survivors;
+		List<Survivor> survivorList = new LinkedList<Survivor>();
+		List<String> namesUsed = new LinkedList<String>();
+		for (int i = 0 ; i < this.rules.getNbSurvivorsStart() ; i++) {
+			Survivor s = new Survivor(namesUsed);
+			namesUsed.add(s.getName());
+			survivorList.add(s);
+		}
+		return survivorList;
 	}
+	
+
 	
 	/**
 	 * When the player ends the current day.
