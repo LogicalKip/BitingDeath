@@ -150,7 +150,7 @@ public class BitingDeathFrame extends JFrame {
 			raidText = "You have not set any raid for today";
 		} else if (raidSettings.getTeam().size() == 0) {
 			raidText = "No survivors selected to run the raid in " + raidSettings.getDestination();
-		}  else {
+		} else {
 			raidText = "You will raid : " + raidSettings.getDestination() + "\nwith :";
 			for (Survivor s : raidSettings.getTeam()) {
 				raidText += "\t- " + s.getName() + "\n";
@@ -161,7 +161,7 @@ public class BitingDeathFrame extends JFrame {
 	
 	public void showAllMessages() {
 	    while (game.thereAreMessagesToDisplay()) {
-				JOptionPane.showMessageDialog(null, this.game.getNextMessageToDisplay(), "Information", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, this.game.getNextMessageToDisplay(), "Information", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 }

@@ -6,6 +6,8 @@ package listeners;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JOptionPane;
+
 import structure.BitingDeathFrame;
 
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
@@ -36,6 +38,10 @@ public class NextDayListener implements ActionListener {
 			this.game.nextDay();
 			this.frame.updateAll();
 			this.frame.showAllMessages();
+			if (this.game.getGameOver()) {
+				JOptionPane.showMessageDialog(null, this.game.getGameOverMessage(), "GAME OVER", JOptionPane.WARNING_MESSAGE);
+				System.exit(0); // TODO any cleaner way to do this ?
+			}
 		} catch (CantRunRaidException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

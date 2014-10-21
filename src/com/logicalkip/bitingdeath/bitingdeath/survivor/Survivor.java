@@ -18,6 +18,17 @@ public class Survivor {
 	 */
 	protected static int survivorsCreated = 0;
 	
+	private final static String maleFirstNames[] = 	{	
+			"John", "Peter", "Jack", "Charles", "Philip", "Luke", "Victor", "Stefan", "Mike", "Glenn"
+		};
+	private final static String femaleFirstNames[] = {	
+			"Sofia", "Judy", "Lois", "Jenny", "Melissa", "Eve", "Evelyn", "Angelina", "Lisa", "Amy"
+		};
+	private final static String surnames[] = {	
+			"Kennedy", "Black", "White", "Field", "Chesterblutch", "Conway", "Reminger", 
+			"Coldsnow", "Hazelnut", "Starbringer", "Griffin"
+		};
+	
 				/* ATTRIBUTES */
 	/**
 	 * ID of the survivor. There must NOT be twice the same ID among survivors (whether dead or alive),
@@ -77,15 +88,23 @@ public class Survivor {
 	}
 	
 	/**
-	 * /!\ FIXME Will loop indefinitely if all name combinations already exist in usedNames (=> many survivors)
-	 * @param usedNames
-	 * @param femaleName
-	 * @return A random name not included in usedNames
+	 * @param usedNames A collection (without duplication) of names (first name + surname) that won't be chosen
+	 * @param femaleName defines whether the returned name should be a female's one.
+	 * @return A random name not included in usedNames. If it's not possible, then any random name.
 	 */
 	public String getRandomUnusedName(Collection<String> usedNames, boolean femaleName) {
 		String name = Survivor.getRandomName(femaleName);
-		while (usedNames.contains(name)) {
-			name = Survivor.getRandomName(femaleName);
+		int nbSurnames = Survivor.surnames.length, nbFirstNames;
+		if (femaleName) {
+			nbFirstNames = Survivor.femaleFirstNames.length;
+		} else {
+			nbFirstNames = Survivor.maleFirstNames.length;
+		}
+		
+		if (usedNames.size() < nbFirstNames * nbSurnames) {
+			while (usedNames.contains(name)) {
+				name = Survivor.getRandomName(femaleName);
+			}
 		}
 		return name;
 	}
@@ -97,25 +116,14 @@ public class Survivor {
 	 * @return a random name, depending on the survivor's sex, given as a parameter
 	 */
 	protected static String getRandomName(boolean femaleName) {
-		String maleFirstNames[] = 	{	
-				"John", "Peter", "Jack", "Charles", "Philip", "Luke", "Victor", "Stefan", "Mike", "Glenn"
-			};
-		String femaleFirstNames[] = {	
-				"Sofia", "Judy", "Lois", "Jenny", "Melissa", "Eve", "Evelyn", "Angelina", "Lisa", "Amy"
-			};
-		String surnames[] = {	
-				"Kennedy", "Black", "White", "Field", "Chesterblutch", "Conway", "Reminger", 
-				"Coldsnow", "Hazelnut", "Starbringer", "Griffin"
-			};
-		
 		String res = "";
 		
 		if (femaleName)
-			res += femaleFirstNames[BitingDeathGame.getRandomInt(0, femaleFirstNames.length - 1)];
+			res += Survivor.femaleFirstNames[BitingDeathGame.getRandomInt(0, Survivor.femaleFirstNames.length - 1)];
 		else
-			res += maleFirstNames[BitingDeathGame.getRandomInt(0, maleFirstNames.length - 1)];
+			res += Survivor.maleFirstNames[BitingDeathGame.getRandomInt(0, Survivor.maleFirstNames.length - 1)];
 		
-		res += " " + surnames[BitingDeathGame.getRandomInt(0, surnames.length - 1)];
+		res += " " + Survivor.surnames[BitingDeathGame.getRandomInt(0, Survivor.surnames.length - 1)];
 		
 		return res;	
 	}

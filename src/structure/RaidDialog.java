@@ -25,7 +25,6 @@ import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 import com.logicalkip.bitingdeath.exceptions.OutOfBoundsException;
 
-//FIXME ^ both Button and JButton, both AWT and swing :/
 
 public class RaidDialog extends JDialog {
 
@@ -234,7 +233,7 @@ public class RaidDialog extends JDialog {
 		this.sendData = false;
 		this.setVisible(true);
 		
-		// If he clicked on "Ok"-like button, sendData == true
+		// If he clicked on a "Ok"-like button, sendData == true
 		return this.sendData ? this.raidSettings : null;
 	}
 	

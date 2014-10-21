@@ -98,7 +98,6 @@ public class BitingDeathGame {
 		this.currentRaidSettings = null;
 	}
 
-	//TODO prevent same-name survivors from existing
 	/**
 	 * Returns a new list of N random survivors, N being defined in this.rules
 	 */
