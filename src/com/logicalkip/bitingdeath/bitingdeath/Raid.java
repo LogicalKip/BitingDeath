@@ -114,12 +114,12 @@ public class Raid {
 					lootFound++;
 			}
 		}
-		
+
 		// LOOT !
 		this.loot = lootFound;
 		if (lootFound == 0)
 			this.messagesToDisplayOnceRaidIsOver.add("Nothing interesting was brought back from " + this.raidSettings.getDestination().getName());
-		
+
 		// Bashing some Zeds, even hurt survivors did.
 		if (nbOfSurvivorsAtFirst > zombiesRoamingTheZone)
 			zombiesKilled = zombiesRoamingTheZone;
@@ -132,16 +132,19 @@ public class Raid {
 			this.messagesToDisplayOnceRaidIsOver.add("One unlucky zombie was killed");
 		else 
 			this.messagesToDisplayOnceRaidIsOver.add(zombiesKilled + " zombies have been killed");
-			
-			iter = this.raidSettings.getTeam().iterator();
-			while(iter.hasNext())
-				iter.next().improveFightingSkill();
-		
-		
+
+		iter = this.raidSettings.getTeam().iterator();
+		while(iter.hasNext()) {
+			Survivor currSurvivor = iter.next();
+			if (zombiesKilled > 0)
+				currSurvivor.improveFightingSkill();
+			currSurvivor.improveScavengingSkill();
+		}
+
 		try {
 			this.raidSettings.getDestination().removeZombies(zombiesKilled);
 		} catch (IncoherentNumberException e) {
-			System.err.println("Erreur de code dans Raid/run : le nombre de zombies � supprimer est incoh�rent");
+			System.err.println("Erreur de code dans Raid/run : le nombre de zombies à supprimer est incohérent");
 			e.printStackTrace();
 		}
 		

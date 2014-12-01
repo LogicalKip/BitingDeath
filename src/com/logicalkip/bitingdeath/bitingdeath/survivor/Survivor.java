@@ -159,6 +159,8 @@ public class Survivor {
 			res += "Mr. ";
 		
 		res += this.name; 
+		
+		res +=  " (Fighting : " + this.skills.getFightingSkill() + ") (Scavenging : " + this.skills.getScavengingSkill() + ")";
 		return res;
 	}
 

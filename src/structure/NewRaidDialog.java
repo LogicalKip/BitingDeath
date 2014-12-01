@@ -19,14 +19,14 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
+import com.logicalkip.bitingdeath.bitingdeath.mapping.Map;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 import com.logicalkip.bitingdeath.exceptions.OutOfBoundsException;
 
 
-public class RaidDialog extends JDialog {
+public class NewRaidDialog extends JDialog {
 
 	private static final long serialVersionUID = 8885619271231314595L;
 
@@ -42,8 +42,15 @@ public class RaidDialog extends JDialog {
 	private RaidSettings raidSettings;
 	
 	
-	private BitingDeathGame game;
-	
+	/**
+	 * List of the displayed survivors that may be selected to run the raid being set up
+	 */
+	private List<Survivor> availableSurvivors;
+
+	/**
+	 * The map from which will selected a Zone to raid
+	 */
+	private Map map;
 	
 	/**
 	 * The Zone the player currently intends to raid. Until he clicks another one.
@@ -58,10 +65,11 @@ public class RaidDialog extends JDialog {
 	private JButton okButton;
 	
 	
-	public RaidDialog (JFrame parent, String title, boolean modal, BitingDeathGame game) {
+	public NewRaidDialog (JFrame parent, String title, boolean modal, List<Survivor> survivors, Map m) {
 		super(parent, title, modal);
-		
-		this.game = game;
+
+		this.availableSurvivors = survivors;
+		this.map = m;
 		this.raidSettings = new RaidSettings(null, null);
 		this.sendData = false;
 		this.currentChosenRaidZone = null;
@@ -85,8 +93,8 @@ public class RaidDialog extends JDialog {
 
 		survivorsPanel.setLayout(new GridBagLayout());
 		
-		this.willBePartOfTheTeam = new JCheckBox[this.game.getSurvivors().size()];
-		Iterator<Survivor> iterator = this.game.getSurvivors().iterator();
+		this.willBePartOfTheTeam = new JCheckBox[this.availableSurvivors.size()];
+		Iterator<Survivor> iterator = this.availableSurvivors.iterator();
 		int i = 0;
 		while (iterator.hasNext()) {
 			Survivor currentSurvivor = iterator.next();
@@ -135,8 +143,8 @@ public class RaidDialog extends JDialog {
 		JPanel mapPanel = new JPanel();
 		mapPanel.setLayout(new GridBagLayout());
 		
-		for (int x = 0 ; x < this.game.getMap().getWidth() ; x++) {
-			for (int y = 0 ; y < this.game.getMap().getHeight() ; y++) {				
+		for (int x = 0 ; x < this.map.getWidth() ; x++) {
+			for (int y = 0 ; y < this.map.getHeight() ; y++) {				
 				JButton currentZoneButton = new JButton(this.getZoneFromMap(x, y).getName());
 				GridBagConstraints currentButtonConstraints = new GridBagConstraints();
 				currentButtonConstraints.gridx = x;
@@ -216,7 +224,7 @@ public class RaidDialog extends JDialog {
 	private Zone getZoneFromMap(int x, int y) {
 		Zone res = null;
 		try {
-			res = this.game.getMap().getZone(x, y);
+			res = this.map.getZone(x, y);
 		} catch (OutOfBoundsException e) {
 			e.printStackTrace();
 		}
@@ -248,7 +256,7 @@ public class RaidDialog extends JDialog {
 		List<Survivor> res = new LinkedList<Survivor>();
 		for (int i = 0 ; i < this.willBePartOfTheTeam.length ; i++) {
 			if (this.willBePartOfTheTeam[i].isSelected())
-				res.add(game.getSurvivors().get(i));
+				res.add(this.availableSurvivors.get(i));
 		}
 		return res;
 	}

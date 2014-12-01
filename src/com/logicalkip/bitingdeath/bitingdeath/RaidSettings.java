@@ -22,6 +22,14 @@ public class RaidSettings {
 	 */
 	protected List<Survivor> team;
 	
+	/**
+	 * Copy constructor
+	 * @param old the RaidSettings from which the new one will be created
+	 */
+	public RaidSettings(RaidSettings old) {
+		this.destination = old.destination;
+		this.team = old.team;
+	}
 	
 	public RaidSettings(Zone destination, List<Survivor> team) {
 		this.destination = destination;

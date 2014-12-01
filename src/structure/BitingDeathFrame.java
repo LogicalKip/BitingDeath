@@ -10,11 +10,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
+import listeners.ManageRaidListener;
 import listeners.NextDayListener;
-import listeners.SetRaidListener;
 
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
-import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 
 /**
@@ -25,17 +24,39 @@ import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 public class BitingDeathFrame extends JFrame {
 
 	/* 
-	 * TODO : preferences, new game, display survivor lists (raid+all), messages/next message, see map, 
-	 * Handle Game over
-     */ 
-	
+	 * TODO /!\ List concerning more or less the Swing implementation : 
+	 * 
+	 * Wouldn't creating new Dialogs every time (instead of reusing the same) accumulate and get slower ? Or garbage collector will get rid of them because they are of no use ?
+	 * 
+	 * Preferences menu (ex : with checkboxes)
+	 * - Always cancel a raid when all survivors dedicated to it are dead
+	 * 
+	 * New game
+	 * 
+	 * Start-alone-mode
+	 * 
+	 * Pressing Esc <=> clicking cancel or |x|
+	 * 
+	 * Save
+	 * 
+	 * Use pictures (for skills, map, ?)
+	 * 
+	 * FIXME Several raids at once (or none at all)
+	 * -> ~"Raid menu", a dialog in which are :
+	 * Minimal display (names, destination) of all currently set raids, and a red cross/whatever for each one to cancel the corresponding raid
+	 * OK, cancel buttons
+	 * Checking : can't be in several raids at once
+	 * -> When s1 dies, remove it from the raid he might have been in, and remove the whole raid if he was the last
+	 * -> Cannot raid same destination with several raids at once (or can we ?)
+	 */ 
+
 	private static final long serialVersionUID = 4518217666862978656L;
 	
 	private BitingDeathGame game;
 	
 	private JLabel foodLabel;
 	
-	private JTextArea currentRaidSettingsText;
+	private JTextArea currentRaidsSettingsText;
 	
 	private JTextArea survivorInfoText;
 	
@@ -49,7 +70,7 @@ public class BitingDeathFrame extends JFrame {
 	 */
 	public BitingDeathFrame(BitingDeathGame newGame) {
 		super();
-		this.setSize(500, 300);
+		this.setSize(700, 300); //FIXME use a "wrapping" method : the smallest size in which everything is seen clearly. Also in Dialogs. frame.pack() ?
 		
 		this.game = newGame;
 
@@ -76,7 +97,7 @@ public class BitingDeathFrame extends JFrame {
 		pane.add(this.foodLabel, c);
 		
 		
-		this.raidButton = new JButton("Set a raid");
+		this.raidButton = new JButton("Manage scavenging raids");
 		c.gridx = 1;
 		pane.add(this.raidButton, c);
 
@@ -84,17 +105,17 @@ public class BitingDeathFrame extends JFrame {
 		c.gridx = 2;
 		pane.add(this.nextDayButton, c);
 
-	    this.currentRaidSettingsText = new JTextArea();
-	    this.currentRaidSettingsText.setEditable(false);
-	    this.currentRaidSettingsText.setCursor(null);  
-	    this.currentRaidSettingsText.setOpaque(false);  
-	    this.currentRaidSettingsText.setFocusable(false);
+	    this.currentRaidsSettingsText = new JTextArea();
+	    this.currentRaidsSettingsText.setEditable(false);
+	    this.currentRaidsSettingsText.setCursor(null);  
+	    this.currentRaidsSettingsText.setOpaque(false);  
+	    this.currentRaidsSettingsText.setFocusable(false);
 	    c.gridy = 1;
 	    c.gridx = 1;
 	    c.gridwidth = 2;
 	    c.weighty = 1;
 	    c.weightx = 1;
-	    pane.add(this.currentRaidSettingsText, c);
+	    pane.add(this.currentRaidsSettingsText, c);
 	    
 	    this.survivorInfoText = new JTextArea();
 	    this.survivorInfoText.setEditable(false);
@@ -107,7 +128,7 @@ public class BitingDeathFrame extends JFrame {
 	    c.weighty = 1;
 	    pane.add(this.survivorInfoText, c);
 
-	    this.raidButton.addActionListener(new SetRaidListener(this.game, this));
+	    this.raidButton.addActionListener(new ManageRaidListener(this.game, this));
 	    this.nextDayButton.addActionListener(new NextDayListener(this.game, this));
 
 	    
@@ -124,9 +145,7 @@ public class BitingDeathFrame extends JFrame {
 		this.updateDisplayedData();
 		
 		// Updating UI
-		if (this.game.getCurrentRaidSettings() == null || 
-			this.game.getCurrentRaidSettings().getTeam().size() == 0 ||
-			this.game.getCurrentRaidSettings().getDestination() == null) {
+		if (this.game.getCurrentPlannedRaids() == null) { // Should not happen
 			this.nextDayButton.setEnabled(false);
 		} else {
 			this.nextDayButton.setEnabled(true);
@@ -137,26 +156,21 @@ public class BitingDeathFrame extends JFrame {
 		this.foodLabel.setText("Rations left : " + this.game.getRations());
 		
 		// Survivor info
-		String survText = "Survivors :\n";;
+		String survText = "Survivors (" + this.game.getSurvivors().size() + "):\n";
 		for (Survivor s : this.game.getSurvivors()) {
 			survText += "   " + s.toString() + "\n";
 		}
 		this.survivorInfoText.setText(survText);
 		
 		// Raid info
-		RaidSettings raidSettings = this.game.getCurrentRaidSettings();
 		String raidText;
-		if (raidSettings == null) {
+		if (this.game.getCurrentPlannedRaids().size() == 0) {
 			raidText = "You have not set any raid for today";
-		} else if (raidSettings.getTeam().size() == 0) {
-			raidText = "No survivors selected to run the raid in " + raidSettings.getDestination();
 		} else {
-			raidText = "You will raid : " + raidSettings.getDestination() + "\nwith :";
-			for (Survivor s : raidSettings.getTeam()) {
-				raidText += "\t- " + s.getName() + "\n";
-			}
+			raidText = "Survivor(s) ready for scavenging (" + this.game.getCurrentPlannedRaids().size() + " raid(s))";
 		}
-		this.currentRaidSettingsText.setText(raidText);
+		
+		this.currentRaidsSettingsText.setText(raidText);
 	}
 	
 	public void showAllMessages() {

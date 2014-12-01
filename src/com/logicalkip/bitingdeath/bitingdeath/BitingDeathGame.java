@@ -12,19 +12,19 @@ import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
 
 
 /* 
- * TODO idea list to improve the game : 
- * being able to build stuff on zones (barricades, bridges in swamp, towers, etc) 
- * several raids at once
- * XP on survivor's skills : fight, scavenge,... (100 max)
- * recruiting, start-alone-mode
- * find a way to be sure that a dying survivor is removed from all lists/var, even a forgotten or not so useful one (leader of survivors, last team used, raids, ...)
+ * TODO /!\ Idea list to improve the game : 
+ * Being able to build stuff on zones (barricades, bridges in swamp, towers (not the auto-shoot style, but rather to improve sight/accuracy), etc) 
+ * 
+ * Recruiting
+ * 
+ * Find a way to be sure that a dying survivor is removed from all lists/var, even a forgotten or not so useful one (leader of survivors, last team used, raids, ...)
  * 		NOTES :
  * 			faire ma classe survlist qui hérite de list<surv>, qui possède en attribut static les survlist ainsi créées
  * 			(via new), et une méthode static qui supprime les surv de toutes les survlist existantes. 
  * 			pb : et les variables simples ? et si on renew une liste (dans une autre classe), l'ancienne sera toujours
  * 			dans survlist.attributstatic et continuera d'etre updatée ? 
  * 			
- * counting how many times a Zone has been raided
+ * Counting how many times a Zone has been raided
  */
 
 
@@ -39,7 +39,7 @@ public class BitingDeathGame {
 
 				/* ATTRIBUTES */
 	/**
-	 * Number of rations (1 survivor needs 1 ration a day)
+	 * Number of rations (for now, 1 survivor needs 1 ration a day)
 	 */
 	protected int rations;
 	
@@ -54,9 +54,10 @@ public class BitingDeathGame {
 	protected int currentDay;
 	
 	/**
-	 * The raid as it will be run for the current day.
+	 * The raids as they will be run for the current day.
+	 * A Survivor must not be in several raids at once.
 	 */
-	protected RaidSettings currentRaidSettings;
+	protected List<RaidSettings> plannedRaids;
 	
 	/**
 	 * If the game is lost.
@@ -70,7 +71,8 @@ public class BitingDeathGame {
 	
 	/**
 	 * The messages that must be displayed to the player. Ex : "X died during a mission", "X has gone because no food left", etc...
-	 * They must be displayed in fifo order, and then removed from the list.
+	 * They must be displayed in FIFO order, and then removed from the list.
+	 * This does not include any game-over message. See {@link BitingDeathGame#gameOverMessage}
 	 */
 	protected List<String> messagesToDisplay;
 	
@@ -95,7 +97,7 @@ public class BitingDeathGame {
 		this.messagesToDisplay = new LinkedList<String>();
 		this.messagesToDisplay.add("Welcome ! Survive as long as you can !");		
 		this.map = new Map(this.rules.getMapRules().getMapWidth(), this.rules.getMapRules().getMapHeight());
-		this.currentRaidSettings = null;
+		this.plannedRaids = new LinkedList<RaidSettings>();
 	}
 
 	/**
@@ -119,11 +121,14 @@ public class BitingDeathGame {
 	 * @throws CantRunRaidException 
 	 */
 	public void nextDay() throws CantRunRaidException {
-		if (this.currentRaidSettings != null)
-			this.runRaid(this.currentRaidSettings);
+		
+		for (RaidSettings currRaid : this.plannedRaids)
+			this.runRaid(currRaid);
+				
+		this.removeEmptyRaids();
 		
 		this.map.randomZombieRoaming();
-		this.rations -= this.survivors.size(); // Eating at evening
+		this.rations -= this.survivors.size(); // Eating during evening
 		
 		this.currentDay++; // Cock-a-doodle-do !
 		
@@ -147,16 +152,14 @@ public class BitingDeathGame {
 	
 	/**
 	 * Run a raid with raidSettings and add found rations to current owned ones.
-	 * Dead survivors will be removed from the list and added as zombies in the raided Zone.
+	 * Dead survivors will be removed from the game and added as zombies in the raided Zone.
 	 * @param raidSettings Must already be created and initialized : team, etc.
 	 * @throws CantRunRaidException 
 	 */
 	private void runRaid(RaidSettings raidSettings) throws CantRunRaidException {
 		Raid raid = new Raid(raidSettings);
 		
-		
 		raid.run();
-		
 		
 		this.messagesToDisplay.addAll(raid.getMessagesToDisplayOnceRaidIsOver());
 		List<Survivor> deadSurvivors = raid.getSurvivorsHurtDuringRaid();
@@ -171,15 +174,14 @@ public class BitingDeathGame {
 		Iterator<Survivor> iter = deadSurvivors.iterator();
 		
 		while (iter.hasNext()) { // Removing dead survivors from the game
-			Survivor nextHurtSurvivor = iter.next();
-			this.removeSurvivorFromGame(nextHurtSurvivor);
+			this.removeSurvivorFromGame(iter.next());
 		}
 		
 		this.rations += raid.getLoot();
 	}
 	
 	/**
-	 * Add a message to a list, waiting to be displayed to the player. (fifo order)
+	 * Add a message to a list, waiting to be displayed to the player. (FIFO order)
 	 * @param msg Does nothing if null
 	 */
 	public void addMessageToDisplay(String msg) {
@@ -188,14 +190,14 @@ public class BitingDeathGame {
 	}
 	
 	/**
-	 * @return Return true if the fifo list of messages-to-display-to-the-user is not empty
+	 * @return Return true if the FIFO list of messages-to-display-to-the-user is not empty
 	 */
 	public boolean thereAreMessagesToDisplay() {
 		return ! this.messagesToDisplay.isEmpty();
 	}
 	
 	/**
-	 * Remove the first message-to-display from the fifo list and return it.
+	 * Remove the first message-to-display from the FIFO list and return it.
 	 * @return the first message of the current list of messages to display, or null if the list is empty
 	 */
 	public String getNextMessageToDisplay() {
@@ -214,7 +216,23 @@ public class BitingDeathGame {
 	 */
 	private void removeSurvivorFromGame(Survivor s) {
 		this.survivors.remove(s);
-		this.currentRaidSettings.team.remove(s);
+		
+		for (RaidSettings currRaid : this.plannedRaids) {
+			currRaid.team.remove(s);
+		}
+	}
+	
+	/**
+	 * Remove from the planned raids those whose Survivor list is empty.
+	 */
+	private void removeEmptyRaids() {
+		List<RaidSettings> newRaidList = new LinkedList<RaidSettings>();
+		for (RaidSettings raid : this.plannedRaids) {
+			if (! raid.getTeam().isEmpty()) {
+				newRaidList.add(raid);
+			}
+		}
+		this.plannedRaids = newRaidList;
 	}
 	
 	
@@ -274,19 +292,40 @@ public class BitingDeathGame {
 	/**
 	 * @return the currentRaidSettings
 	 */
-	public RaidSettings getCurrentRaidSettings() {
-		return this.currentRaidSettings;
+	public List<RaidSettings> getCurrentPlannedRaids() {
+		return this.plannedRaids;
 	}
 
 
 	/**
 	 * @param currentRaidSettings the currentRaidSettings to set
 	 */
-	public void setCurrentRaidSettings(RaidSettings currentRaidSettings) {
-		this.currentRaidSettings = currentRaidSettings;
+	public void setCurrentRaidSettings(List<RaidSettings> currentRaidSettings) {
+		this.plannedRaids = currentRaidSettings;
 	}
 
 	public int getRations() {
 		return rations;
 	}	
+	
+	/**
+	 * Get idle survivors
+	 * @return all survivors who are not involved in a raid today
+	 */
+	public List<Survivor> getAvailableSurvivors() {
+		List<Survivor> res = new LinkedList<Survivor>();
+		for (Survivor s : this.survivors) {
+			boolean available = true;
+			for (RaidSettings raid : this.plannedRaids) {
+				if (raid.getTeam().contains(s)) {
+					available = false;
+				}
+			}
+			if (available) {
+				res.add(s);
+			}
+		}
+		
+		return res;
+	}
 }

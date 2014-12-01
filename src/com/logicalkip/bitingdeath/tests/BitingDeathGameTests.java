@@ -1,5 +1,6 @@
 package com.logicalkip.bitingdeath.tests;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
@@ -55,8 +56,9 @@ public class BitingDeathGameTests {
 
 		while (!game.getGameOver()) {
 			System.out.println(game.getInventory());
-			
-			game.setCurrentRaidSettings(raid);
+			List<RaidSettings> raidList = new LinkedList<RaidSettings>();
+			raidList.add(raid);
+			game.setCurrentRaidSettings(raidList);
 
 
 //			System.out.println("\n\nRAID : " + raid + "\nStill "

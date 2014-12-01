@@ -2,12 +2,14 @@ package listeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
-import structure.BitingDeathFrame;
-import structure.RaidDialog;
+import structure.NewRaidDialog;
+import structure.RaidManagingDialog;
 
-import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
+import com.logicalkip.bitingdeath.bitingdeath.mapping.Map;
+import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 
 /**
  * Describes what to do when the "Set raid" button is clicked
@@ -16,24 +18,27 @@ import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
  */
 public class SetRaidListener implements ActionListener {
 	
-	private BitingDeathGame game;
+	private List<Survivor> availableSurvivors;
 	
-	private BitingDeathFrame frame;
+	private Map map;
+		
+	private RaidManagingDialog raidManagingDialog;
 	
-	public SetRaidListener(BitingDeathGame g, BitingDeathFrame f) {
-		this.game = g;
-		this.frame = f;
+	
+	public SetRaidListener(List<Survivor> availableSurvivors, Map m, RaidManagingDialog dialog) {
+		this.availableSurvivors = availableSurvivors;
+		this.map = m;
+		this.raidManagingDialog = dialog;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		RaidDialog raidDialog = new RaidDialog(null, "Setting a raid", true, this.game);
-		RaidSettings raidSettings = raidDialog.showRaidDialog();
+		NewRaidDialog raidDialog = new NewRaidDialog(null, "Setting a raid", true, this.availableSurvivors, this.map);
+		RaidSettings userDefinedRaid = raidDialog.showRaidDialog();
 		
-		if (raidSettings != null) {
-			this.game.setCurrentRaidSettings(raidSettings);
+		if (userDefinedRaid != null) {
+			this.raidManagingDialog.addRaid(userDefinedRaid);
 		}
-		this.frame.updateAll();
+		this.raidManagingDialog.updateAll();
 	}
-
 }
