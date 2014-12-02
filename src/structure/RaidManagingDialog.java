@@ -82,7 +82,8 @@ public class RaidManagingDialog extends JDialog {
 		c.gridx = 0;
 		c.gridy = 0;
 		this.newRaidButton = new JButton("Add a new raid");
-		this.newRaidButton.addActionListener(new SetRaidListener(this.game.getAvailableSurvivors(), this.game.getMap(), this));//FIXME it's not really the actual available survivors. You have to remove or add some, corresponding to what the user has set 
+		this.newRaidButton.addActionListener(new SetRaidListener(this.game.getMap(), this));//FIXME it's not really the actual available survivors. You have to remove or add some, corresponding to what the user has set 
+		
 		pane.add(this.newRaidButton, c);
 		
 		
@@ -123,6 +124,27 @@ public class RaidManagingDialog extends JDialog {
 	}
 	
 	/**
+	 * Return idle survivors, excluding those that have just been chosen (but not confirmed yet)
+	 */
+	public List<Survivor> getSurvivorsNotPicked() {
+		//FIXME cleaner  : naming, check, etc
+		List<Survivor> res = new LinkedList<Survivor>();
+		
+		for (Survivor s : game.getAvailableSurvivors()) {
+			boolean alreadyChosen = false;
+			for (RaidSettings raid : this.raids) {
+				if (raid.getTeam().contains(s)) {
+					alreadyChosen = true;
+				}
+			}
+			if (!alreadyChosen) {
+				res.add(s);
+			}
+		}
+		return res;
+	}
+	
+	/**
 	 * Show the dialog window, allowing the user to manage the raids (create, remove, etc)
 	 * and hides it when he is finished with it.
 	 * @return The raids to run today or null if he canceled.
@@ -140,7 +162,7 @@ public class RaidManagingDialog extends JDialog {
 	}
 	
 	public void updateAll() {
-		this.newRaidButton.setEnabled(this.game.getAvailableSurvivors().size() > 0);//FIXME not the actual idle survivors, need to consider those checked and unchecked for the current dialog
+		this.newRaidButton.setEnabled(this.getSurvivorsNotPicked().size() > 0);
 		
 		
 		JPanel scrollableRaidListPanel = new JPanel();
@@ -169,10 +191,7 @@ public class RaidManagingDialog extends JDialog {
 
 		this.raidListScrollPane.setViewportView(scrollableRaidListPanel);
 		this.validate();
-		this.repaint();
-	
-	//	this.raidListScrollPane.setVisible(true);// FIXME useful ? Remove when all is OK if not necessary
-		
+		this.repaint();		
 		
 	}	
 }
