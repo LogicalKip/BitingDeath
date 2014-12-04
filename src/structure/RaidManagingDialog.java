@@ -23,6 +23,7 @@ import listeners.SetRaidListener;
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
+import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
 
 /**
  * The dialog in which the user can set up new raids, (maybe edit) or remove some.
@@ -82,7 +83,7 @@ public class RaidManagingDialog extends JDialog {
 		c.gridx = 0;
 		c.gridy = 0;
 		this.newRaidButton = new JButton("Add a new raid");
-		this.newRaidButton.addActionListener(new SetRaidListener(this.game.getMap(), this));//FIXME it's not really the actual available survivors. You have to remove or add some, corresponding to what the user has set 
+		this.newRaidButton.addActionListener(new SetRaidListener(this.game.getMap(), this)); 
 		
 		pane.add(this.newRaidButton, c);
 		
@@ -127,7 +128,6 @@ public class RaidManagingDialog extends JDialog {
 	 * Return idle survivors, excluding those that have just been chosen (but not confirmed yet)
 	 */
 	public List<Survivor> getSurvivorsNotPicked() {
-		//FIXME cleaner  : naming, check, etc
 		List<Survivor> res = new LinkedList<Survivor>();
 		
 		for (Survivor s : game.getAvailableSurvivors()) {
@@ -183,7 +183,10 @@ public class RaidManagingDialog extends JDialog {
 			destinationArea.setOpaque(false);
 			panel.add(destinationArea);
 			
-			panel.add(new JButton("Delete")); //TODO ActionListener
+			
+			JButton deleteButton = new JButton("Delete");
+			deleteButton.addActionListener(new RemoveRaidListener(this.raids.indexOf(raid), this));
+			panel.add(deleteButton);
 			
 			panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			scrollableRaidListPanel.add(panel);
@@ -194,4 +197,15 @@ public class RaidManagingDialog extends JDialog {
 		this.repaint();		
 		
 	}	
+	
+	/**
+	 * Remove the nth raid in the list (starting at 0)
+	 * @param n
+	 */
+	public void removeRaid(int n) throws IncoherentNumberException {
+		if (n < 0 || n >= this.raids.size())
+			throw new IncoherentNumberException();
+		else
+			this.raids.remove(n);
+	}
 }

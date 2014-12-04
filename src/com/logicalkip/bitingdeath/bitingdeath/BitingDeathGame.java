@@ -224,6 +224,7 @@ public class BitingDeathGame {
 	
 	/**
 	 * Remove from the planned raids those whose Survivor list is empty.
+	 * (Creates a new list without the empty raids)
 	 */
 	private void removeEmptyRaids() {
 		List<RaidSettings> newRaidList = new LinkedList<RaidSettings>();

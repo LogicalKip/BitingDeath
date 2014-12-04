@@ -43,10 +43,8 @@ public class BitingDeathFrame extends JFrame {
 	 * 
 	 * FIXME Several raids at once (or none at all)
 	 * -> ~"Raid menu", a dialog in which are :
-	 * Minimal display (names, destination) of all currently set raids, and a red cross/whatever for each one to cancel the corresponding raid
-	 * OK, cancel buttons
+	 * a red cross/whatever for each one to cancel the corresponding raid
 	 * Checking : can't be in several raids at once
-	 * -> When s1 dies, remove it from the raid he might have been in, and remove the whole raid if he was the last
 	 * -> Cannot raid same destination with several raids at once (or can we ?)
 	 */ 
 
@@ -84,7 +82,7 @@ public class BitingDeathFrame extends JFrame {
 		pane.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 
-		//natural height, maximum width
+		// Natural height, maximum width
 		c.fill = GridBagConstraints.HORIZONTAL;
 
 		this.foodLabel = new JLabel();
@@ -105,11 +103,7 @@ public class BitingDeathFrame extends JFrame {
 		c.gridx = 2;
 		pane.add(this.nextDayButton, c);
 
-	    this.currentRaidsSettingsText = new JTextArea();
-	    this.currentRaidsSettingsText.setEditable(false);
-	    this.currentRaidsSettingsText.setCursor(null);  
-	    this.currentRaidsSettingsText.setOpaque(false);  
-	    this.currentRaidsSettingsText.setFocusable(false);
+	    this.currentRaidsSettingsText = this.createTextArea();
 	    c.gridy = 1;
 	    c.gridx = 1;
 	    c.gridwidth = 2;
@@ -117,11 +111,7 @@ public class BitingDeathFrame extends JFrame {
 	    c.weightx = 1;
 	    pane.add(this.currentRaidsSettingsText, c);
 	    
-	    this.survivorInfoText = new JTextArea();
-	    this.survivorInfoText.setEditable(false);
-	    this.survivorInfoText.setCursor(null);  
-	    this.survivorInfoText.setOpaque(false);  
-	    this.survivorInfoText.setFocusable(false);
+	    this.survivorInfoText = this.createTextArea();
 	    c.gridy = 1;
 	    c.gridx = 0;
 	    c.gridwidth = 1;
@@ -131,14 +121,22 @@ public class BitingDeathFrame extends JFrame {
 	    this.raidButton.addActionListener(new ManageRaidListener(this.game, this));
 	    this.nextDayButton.addActionListener(new NextDayListener(this.game, this));
 
-	    
 	    this.updateAll();
-		
 		
 		this.setVisible(true);
 		
 		this.showAllMessages();
 	    
+	}
+	
+	private JTextArea createTextArea() {
+		JTextArea text = new JTextArea();
+		text.setEditable(false);
+		text.setCursor(null);  
+		text.setOpaque(false);  
+		text.setFocusable(false);
+
+		return text;
 	}
 	
 	public void updateAll() {
