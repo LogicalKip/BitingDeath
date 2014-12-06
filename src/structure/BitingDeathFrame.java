@@ -40,12 +40,6 @@ public class BitingDeathFrame extends JFrame {
 	 * Save
 	 * 
 	 * Use pictures (for skills, map, ?)
-	 * 
-	 * FIXME Several raids at once (or none at all)
-	 * -> ~"Raid menu", a dialog in which are :
-	 * a red cross/whatever for each one to cancel the corresponding raid
-	 * Checking : can't be in several raids at once
-	 * -> Cannot raid same destination with several raids at once (or can we ?)
 	 */ 
 
 	private static final long serialVersionUID = 4518217666862978656L;

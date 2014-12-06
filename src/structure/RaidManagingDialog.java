@@ -67,7 +67,7 @@ public class RaidManagingDialog extends JDialog {
 		
 		this.setResizable(true);
 		this.setVisible(false);
-		this.setSize(800, 600);
+		this.setSize(800, 600);   // TODO Replace all setSize() with something else for they are (?) not the best practice
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		this.initComponent();
@@ -130,7 +130,7 @@ public class RaidManagingDialog extends JDialog {
 	public List<Survivor> getSurvivorsNotPicked() {
 		List<Survivor> res = new LinkedList<Survivor>();
 		
-		for (Survivor s : game.getAvailableSurvivors()) {
+		for (Survivor s : game.getSurvivors()) {
 			boolean alreadyChosen = false;
 			for (RaidSettings raid : this.raids) {
 				if (raid.getTeam().contains(s)) {
@@ -207,5 +207,9 @@ public class RaidManagingDialog extends JDialog {
 			throw new IncoherentNumberException();
 		else
 			this.raids.remove(n);
+	}
+
+	public List<RaidSettings> getRaids() {
+		return raids;
 	}
 }

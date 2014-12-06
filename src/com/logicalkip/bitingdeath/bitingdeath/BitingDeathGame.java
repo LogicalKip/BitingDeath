@@ -31,7 +31,7 @@ import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
 
 /**
  * A zombie game mostly made of options and menus. Sending survivors scavenging, etc.
- * This class does not feature display and should be instancied or extended for real use.
+ * This class does not feature display and should be instanced or extended for real use.
  * @author LogicalKip
  *
  */
@@ -55,7 +55,8 @@ public class BitingDeathGame {
 	
 	/**
 	 * The raids as they will be run for the current day.
-	 * A Survivor must not be in several raids at once.
+	 * /!\ You must not put a Survivor in several raids at once.
+	 * No checking will be made.
 	 */
 	protected List<RaidSettings> plannedRaids;
 	
@@ -309,24 +310,4 @@ public class BitingDeathGame {
 		return rations;
 	}	
 	
-	/**
-	 * Get idle survivors
-	 * @return all survivors who are not involved in a raid today
-	 */
-	public List<Survivor> getAvailableSurvivors() {
-		List<Survivor> res = new LinkedList<Survivor>();
-		for (Survivor s : this.survivors) {
-			boolean available = true;
-			for (RaidSettings raid : this.plannedRaids) {
-				if (raid.getTeam().contains(s)) {
-					available = false;
-				}
-			}
-			if (available) {
-				res.add(s);
-			}
-		}
-		
-		return res;
-	}
 }

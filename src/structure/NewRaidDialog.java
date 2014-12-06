@@ -58,18 +58,29 @@ public class NewRaidDialog extends JDialog {
 	private Zone currentChosenRaidZone;
 	
 	/**
+	 * A list of Zones from the map that the user won't be able to choose.
+	 */
+	private List<Zone> zonesUnraidable;
+	
+	/**
 	 * Checking one of those checkboxes means that you want the matching survivor to be in the Raid.
 	 */
 	private JCheckBox []willBePartOfTheTeam;
 	
 	private JButton okButton;
 	
-	
-	public NewRaidDialog (JFrame parent, String title, boolean modal, List<Survivor> survivors, Map m) {
+	/**
+	 * 
+	 * @param survivors List of the survivors the user will choose from to set on the raid.
+	 * @param m The map from which will be picked a destination to raid
+	 * @param zonesUnraidable A list of Zones from the map that the user won't be able to choose.
+	 */
+	public NewRaidDialog (JFrame parent, String title, boolean modal, List<Survivor> survivors, Map m, List<Zone> zonesUnraidable) {
 		super(parent, title, modal);
 
 		this.availableSurvivors = survivors;
 		this.map = m;
+		this.zonesUnraidable = zonesUnraidable;
 		this.raidSettings = new RaidSettings(null, null);
 		this.sendData = false;
 		this.currentChosenRaidZone = null;
@@ -79,7 +90,6 @@ public class NewRaidDialog extends JDialog {
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		this.initComponent();
-		//TODO cocher de base tout ce qui est dans raidSettings (suffit de ne pas réallouer willBePartOfTheTeam pour conserver les coches ? pb avec le nb de surv qui a pu changer ?)
 	}
 	
 	
@@ -165,7 +175,8 @@ public class NewRaidDialog extends JDialog {
 						zoneInfoLabel.setText("You will raid : " + currentChosenRaidZone.getName());
 					}
 				});
-				
+				currentZoneButton.setEnabled(! this.zonesUnraidable.contains(this.getZoneFromMap(x, y)));
+
 				
 				mapPanel.add(currentZoneButton, currentButtonConstraints);
 			}
