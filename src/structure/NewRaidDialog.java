@@ -86,7 +86,6 @@ public class NewRaidDialog extends JDialog {
 		this.currentChosenRaidZone = null;
 		this.setResizable(true);
 		this.setVisible(false);
-		this.setSize(800, 400);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		this.initComponent();
@@ -226,6 +225,8 @@ public class NewRaidDialog extends JDialog {
 		
 		panelConstraint.gridy = 2;
 		this.getContentPane().add(closeButtonsPanel, panelConstraint);
+		
+		this.pack();
 	}
 	
 	/**

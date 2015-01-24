@@ -17,6 +17,8 @@ import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
  * 
  * Recruiting
  * 
+ * Finding weapons/tools (either to equip or just improving overall chances)
+ * 
  * Find a way to be sure that a dying survivor is removed from all lists/var, even a forgotten or not so useful one (leader of survivors, last team used, raids, ...)
  * 		NOTES :
  * 			faire ma classe survlist qui hérite de list<surv>, qui possède en attribut static les survlist ainsi créées

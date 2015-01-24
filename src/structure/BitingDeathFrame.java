@@ -28,9 +28,6 @@ public class BitingDeathFrame extends JFrame {
 	 * 
 	 * Wouldn't creating new Dialogs every time (instead of reusing the same) accumulate and get slower ? Or garbage collector will get rid of them because they are of no use ?
 	 * 
-	 * Preferences menu (ex : with checkboxes)
-	 * - Always cancel a raid when all survivors dedicated to it are dead
-	 * 
 	 * New game
 	 * 
 	 * Start-alone-mode
@@ -62,7 +59,6 @@ public class BitingDeathFrame extends JFrame {
 	 */
 	public BitingDeathFrame(BitingDeathGame newGame) {
 		super();
-		this.setSize(700, 300); //FIXME use a "wrapping" method : the smallest size in which everything is seen clearly. Also in Dialogs. frame.pack() ?
 		
 		this.game = newGame;
 
@@ -74,6 +70,7 @@ public class BitingDeathFrame extends JFrame {
 		Container pane = this.getContentPane();
 
 		pane.setLayout(new GridBagLayout());
+
 		GridBagConstraints c = new GridBagConstraints();
 
 		// Natural height, maximum width
@@ -116,7 +113,6 @@ public class BitingDeathFrame extends JFrame {
 	    this.nextDayButton.addActionListener(new NextDayListener(this.game, this));
 
 	    this.updateAll();
-		
 		this.setVisible(true);
 		
 		this.showAllMessages();
@@ -142,6 +138,8 @@ public class BitingDeathFrame extends JFrame {
 		} else {
 			this.nextDayButton.setEnabled(true);
 		}
+		
+		this.pack();
 	}
 	
 	public void updateDisplayedData() {

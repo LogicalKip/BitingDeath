@@ -43,7 +43,6 @@ public class NextDayListener implements ActionListener {
 				System.exit(0); // TODO any cleaner way to do this ?
 			}
 		} catch (CantRunRaidException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	
