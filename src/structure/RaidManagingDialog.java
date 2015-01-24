@@ -67,9 +67,10 @@ public class RaidManagingDialog extends JDialog {
 		
 		this.setResizable(true);
 		this.setVisible(false);
-		this.setLocationRelativeTo(null);
+		
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		this.initComponent();
+		
 		this.updateAll();
 	}
 	
@@ -194,9 +195,9 @@ public class RaidManagingDialog extends JDialog {
 		
 		this.raidListScrollPane.setViewportView(scrollableRaidListPanel);
 		this.pack();
+		this.setLocationRelativeTo(null);
 		this.validate();
 		this.repaint();	
-		
 	}	
 	
 	/**

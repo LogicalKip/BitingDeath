@@ -37,6 +37,8 @@ public class BitingDeathFrame extends JFrame {
 	 * Save
 	 * 
 	 * Use pictures (for skills, map, ?)
+	 * 
+	 * Remember where user put windows and display them same place next time
 	 */ 
 
 	private static final long serialVersionUID = 4518217666862978656L;
@@ -63,9 +65,7 @@ public class BitingDeathFrame extends JFrame {
 		this.game = newGame;
 
 		this.setTitle("Biting Death");
-		this.setLocationRelativeTo(null);
 		this.setMenuBar(new BitingDeathMenuBar(game, this));
-
 
 		Container pane = this.getContentPane();
 
@@ -114,9 +114,10 @@ public class BitingDeathFrame extends JFrame {
 
 	    this.updateAll();
 		this.setVisible(true);
+
+		
 		
 		this.showAllMessages();
-	    
 	}
 	
 	private JTextArea createTextArea() {
@@ -140,6 +141,7 @@ public class BitingDeathFrame extends JFrame {
 		}
 		
 		this.pack();
+		this.setLocationRelativeTo(null);
 	}
 	
 	public void updateDisplayedData() {
