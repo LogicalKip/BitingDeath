@@ -3,6 +3,7 @@ package structure;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,6 +15,7 @@ import listeners.ManageRaidListener;
 import listeners.NextDayListener;
 
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
+import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 
 /**
@@ -154,15 +156,29 @@ public class BitingDeathFrame extends JFrame {
 		}
 		this.survivorInfoText.setText(survText);
 		
-		// Raid info
+		this.currentRaidsSettingsText.setText(getRaidInfo());
+	}
+	
+	/**
+	 * Builds and return a string featuring the number of raid(s) and its runner(s), without using "(s)"
+	 */
+	private String getRaidInfo() {
 		String raidText;
-		if (this.game.getCurrentPlannedRaids().size() == 0) {
+		List<RaidSettings> raids = this.game.getCurrentPlannedRaids();
+		int nbRaids = raids.size();
+		
+		if (nbRaids == 0) {
 			raidText = "You have not set any raid for today";
 		} else {
-			raidText = "Survivor(s) ready for scavenging (" + this.game.getCurrentPlannedRaids().size() + " raid(s))";
-		}
-		
-		this.currentRaidsSettingsText.setText(raidText);
+			raidText = "Survivor";
+			
+			if (! (nbRaids == 1 && raids.get(0).getTeam().size() == 1)) {
+				raidText += "s";
+			}
+			
+			raidText += " ready for scavenging (" + nbRaids + " raid" + (nbRaids > 1 ? "s" : "") + ")";
+		}		
+		return raidText;
 	}
 	
 	public void showAllMessages() {

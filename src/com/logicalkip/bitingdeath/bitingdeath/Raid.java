@@ -94,14 +94,14 @@ public class Raid {
 				nbOfSurvivorsAtFirst = this.raidSettings.getTeam().size();
 		double rand;
 		
-		Iterator<Survivor> iter = this.raidSettings.getTeam().iterator();
+		Iterator<Survivor> teamIterator = this.raidSettings.getTeam().iterator();
 		
 		this.messagesToDisplayOnceRaidIsOver = new LinkedList<String>();
 		this.survivorsHurtDuringRaid = new LinkedList<Survivor>();
 
 		//TODO looting before or after killing zombies (% danger) ? 
-		while (iter.hasNext()) {
-			Survivor currentSurvivor = iter.next();
+		while (teamIterator.hasNext()) {
+			Survivor currentSurvivor = teamIterator.next();
 			if (BitingDeathGame.getRandomProbability() > chancesOfSurvivingTheRaid(currentSurvivor, zombiesRoamingTheZone)) {
 				// Too bad.
 				this.survivorsHurtDuringRaid.add(currentSurvivor);
@@ -117,7 +117,7 @@ public class Raid {
 
 		// LOOT !
 		this.loot = lootFound;
-		if (lootFound == 0)
+		if (lootFound == 0 && this.survivorsHurtDuringRaid.size() != this.raidSettings.getTeam().size())
 			this.messagesToDisplayOnceRaidIsOver.add("Nothing interesting was brought back from " + this.raidSettings.getDestination().getName());
 
 		// Bashing some Zeds, even hurt survivors did.
@@ -133,9 +133,9 @@ public class Raid {
 		else 
 			this.messagesToDisplayOnceRaidIsOver.add(zombiesKilled + " zombies have been killed");
 
-		iter = this.raidSettings.getTeam().iterator();
-		while(iter.hasNext()) {
-			Survivor currSurvivor = iter.next();
+		teamIterator = this.raidSettings.getTeam().iterator();
+		while(teamIterator.hasNext()) {
+			Survivor currSurvivor = teamIterator.next();
 			if (zombiesKilled > 0)
 				currSurvivor.improveFightingSkill();
 			currSurvivor.improveScavengingSkill();
@@ -144,7 +144,7 @@ public class Raid {
 		try {
 			this.raidSettings.getDestination().removeZombies(zombiesKilled);
 		} catch (IncoherentNumberException e) {
-			System.err.println("Erreur de code dans Raid/run : le nombre de zombies à supprimer est incohérent");
+			System.err.println("Erreur de code dans Raid#run : le nombre de zombies à supprimer est incohérent");
 			e.printStackTrace();
 		}
 		
@@ -154,7 +154,7 @@ public class Raid {
 	 * Return a double between 0 (excluded, we never know =P) and 1 (if there are no zombies), 
 	 * higher if survivor is more likely to survive the raid.
 	 * More people in the team means much higher chances.
-	 * @param survivor His personnal attributes might change the deal.
+	 * @param survivor His personal attributes might change the deal.
 	 * @param actualZombiesInTheZone The more, the riskier ! Above 100, things are considered the same.
 	 * @return
 	 */
