@@ -3,8 +3,6 @@ package structure;
 import java.awt.Menu;
 import java.awt.MenuItem;
 
-import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
-
 public class RaidMenu extends Menu {
 	
 	private static final long serialVersionUID = 7594933627709899021L;
@@ -24,7 +22,7 @@ public class RaidMenu extends Menu {
 	 */
 	private MenuItem run;
 	
-	public RaidMenu(BitingDeathGame game, BitingDeathFrame frame) {
+	public RaidMenu(BitingDeathFrame frame) {
 		super("Raid");
 		
 		this.set = new MenuItem("Set");

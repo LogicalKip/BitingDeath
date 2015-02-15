@@ -30,8 +30,6 @@ public class BitingDeathFrame extends JFrame {
 	 * 
 	 * Wouldn't creating new Dialogs every time (instead of reusing the same) accumulate and get slower ? Or garbage collector will get rid of them because they are of no use ?
 	 * 
-	 * New game
-	 * 
 	 * Start-alone-mode
 	 * 
 	 * Pressing Esc <=> clicking cancel or |x|
@@ -67,7 +65,7 @@ public class BitingDeathFrame extends JFrame {
 		this.game = newGame;
 
 		this.setTitle("Biting Death");
-		this.setMenuBar(new BitingDeathMenuBar(game, this));
+		this.setMenuBar(new BitingDeathMenuBar(this));
 
 		Container pane = this.getContentPane();
 
@@ -96,7 +94,7 @@ public class BitingDeathFrame extends JFrame {
 		c.gridx = 2;
 		pane.add(this.nextDayButton, c);
 
-	    this.currentRaidsSettingsText = this.createTextArea();
+	    this.currentRaidsSettingsText = createTextArea();
 	    c.gridy = 1;
 	    c.gridx = 1;
 	    c.gridwidth = 2;
@@ -104,15 +102,15 @@ public class BitingDeathFrame extends JFrame {
 	    c.weightx = 1;
 	    pane.add(this.currentRaidsSettingsText, c);
 	    
-	    this.survivorInfoText = this.createTextArea();
+	    this.survivorInfoText = createTextArea();
 	    c.gridy = 1;
 	    c.gridx = 0;
 	    c.gridwidth = 1;
 	    c.weighty = 1;
 	    pane.add(this.survivorInfoText, c);
 
-	    this.raidButton.addActionListener(new ManageRaidListener(this.game, this));
-	    this.nextDayButton.addActionListener(new NextDayListener(this.game, this));
+	    this.raidButton.addActionListener(new ManageRaidListener(this));
+	    this.nextDayButton.addActionListener(new NextDayListener(this));
 
 	    this.updateAll();
 		this.setVisible(true);
@@ -122,7 +120,7 @@ public class BitingDeathFrame extends JFrame {
 		this.showAllMessages();
 	}
 	
-	private JTextArea createTextArea() {
+	public static JTextArea createTextArea() {
 		JTextArea text = new JTextArea();
 		text.setEditable(false);
 		text.setCursor(null);  
@@ -185,5 +183,15 @@ public class BitingDeathFrame extends JFrame {
 	    while (game.thereAreMessagesToDisplay()) {
 			JOptionPane.showMessageDialog(null, this.game.getNextMessageToDisplay(), "Information", JOptionPane.INFORMATION_MESSAGE);
 		}
+	}
+	
+	public void startNewGame() {
+		this.game = new BitingDeathGame();
+		this.updateAll();
+		this.showAllMessages();
+	}
+
+	public BitingDeathGame getGame() {
+		return game;
 	}
 }

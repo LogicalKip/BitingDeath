@@ -10,7 +10,6 @@ import javax.swing.JOptionPane;
 
 import structure.BitingDeathFrame;
 
-import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 import com.logicalkip.bitingdeath.exceptions.CantRunRaidException;
 
 /**
@@ -20,12 +19,9 @@ import com.logicalkip.bitingdeath.exceptions.CantRunRaidException;
  */
 public class NextDayListener implements ActionListener {
 	
-	private BitingDeathGame game;
-	
 	private BitingDeathFrame frame;
 	
-	public NextDayListener(BitingDeathGame g, BitingDeathFrame f) {
-		this.game = g;
+	public NextDayListener(BitingDeathFrame f) {
 		this.frame = f;
 	}
 
@@ -35,11 +31,11 @@ public class NextDayListener implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-			this.game.nextDay();
+			this.frame.getGame().nextDay();
 			this.frame.updateAll();
 			this.frame.showAllMessages();
-			if (this.game.getGameOver()) {
-				JOptionPane.showMessageDialog(null, this.game.getGameOverMessage(), "GAME OVER", JOptionPane.WARNING_MESSAGE);
+			if (this.frame.getGame().getGameOver()) {
+				JOptionPane.showMessageDialog(null, this.frame.getGame().getGameOverMessage(), "GAME OVER", JOptionPane.WARNING_MESSAGE);
 				System.exit(0); // TODO any cleaner way to do this ?
 			}
 		} catch (CantRunRaidException e1) {

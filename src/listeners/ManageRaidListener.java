@@ -7,27 +7,23 @@ import java.util.List;
 import structure.BitingDeathFrame;
 import structure.RaidManagingDialog;
 
-import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
 
 public class ManageRaidListener implements ActionListener {
-	
-	private BitingDeathGame game;
-	
+		
 	private BitingDeathFrame frame;
 	
-	public ManageRaidListener(BitingDeathGame g, BitingDeathFrame f) {
-		this.game = g;
+	public ManageRaidListener(BitingDeathFrame f) {
 		this.frame = f;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		RaidManagingDialog dialog = new RaidManagingDialog(null, "Scavenging menu", true, this.game);
+		RaidManagingDialog dialog = new RaidManagingDialog(null, "Scavenging menu", true, this.frame.getGame());
 		List<RaidSettings> userDefinedRaids = dialog.showDialog();
 		
 		if (userDefinedRaids != null) {
-			this.game.setCurrentRaidSettings(userDefinedRaids);
+			this.frame.getGame().setCurrentRaidSettings(userDefinedRaids);
 		}
 		
 		this.frame.updateAll();
