@@ -13,7 +13,7 @@ public abstract class Zone {
 				
 				/* ATTRIBUTES */
 	/**
-	 * Ex : "Darkwood Forest - North", "Nowhere City" :)
+	 * Ex : "Darkwood Forest - North", "Nowhere City"
 	 */
 	protected String name;// TODO random names (prefix-suffix system)
 	
@@ -114,7 +114,7 @@ public abstract class Zone {
 	}
 	
 	/**
-	 * @return the kind of zone (Forest, plain, etc), so that one can know inwhat subclass one should cast.
+	 * @return the kind of zone (Forest, plain, etc), so that one can know in what subclass one should cast.
 	 */
 	public KindOfZone getKindOfZone() {
 		return this.kindOfZone;

@@ -57,12 +57,12 @@ public class BitingDeathFrame extends JFrame {
 	
 	/**
 	 * Starts the graphical interface for the game.
-	 * @param newGame must not be null
+	 * @param newGame will instantiate a new BitingDeathGame if null
 	 */
 	public BitingDeathFrame(BitingDeathGame newGame) {
 		super();
 		
-		this.game = newGame;
+		this.game = (newGame == null ? new BitingDeathGame() : newGame);
 
 		this.setTitle("Biting Death");
 		this.setMenuBar(new BitingDeathMenuBar(this));

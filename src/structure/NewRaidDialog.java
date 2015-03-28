@@ -20,6 +20,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
+import com.logicalkip.bitingdeath.bitingdeath.mapping.Base;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Map;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
@@ -69,13 +70,16 @@ public class NewRaidDialog extends JDialog {
 	
 	private JButton okButton;
 	
+	private Base mainbase;
+	
 	/**
 	 * 
 	 * @param survivors List of the survivors the user will choose from to set on the raid.
 	 * @param m The map from which will be picked a destination to raid
 	 * @param zonesUnraidable A list of Zones from the map that the user won't be able to choose.
+	 * @param mainBase The base were the survivors will be going from. Will not be raidable
 	 */
-	public NewRaidDialog (JFrame parent, String title, boolean modal, List<Survivor> survivors, Map m, List<Zone> zonesUnraidable) {
+	public NewRaidDialog (JFrame parent, String title, boolean modal, List<Survivor> survivors, Map m, List<Zone> zonesUnraidable, Base mainbase) {
 		super(parent, title, modal);
 
 		this.availableSurvivors = survivors;
@@ -84,6 +88,7 @@ public class NewRaidDialog extends JDialog {
 		this.raidSettings = new RaidSettings(null, null);
 		this.sendData = false;
 		this.currentChosenRaidZone = null;
+		this.mainbase = mainbase;
 		this.setResizable(true);
 		this.setVisible(false);
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -153,7 +158,14 @@ public class NewRaidDialog extends JDialog {
 		
 		for (int x = 0 ; x < this.map.getWidth() ; x++) {
 			for (int y = 0 ; y < this.map.getHeight() ; y++) {				
-				JButton currentZoneButton = new JButton(this.getZoneFromMap(x, y).getName());
+				JButton currentZoneButton = new JButton();
+				if (isMainBaseLocation(x, y)) {
+					currentZoneButton.setText("BASE");
+				} 
+				else {
+					currentZoneButton.setText(this.getZoneFromMap(x, y).getName());
+				}
+				
 				GridBagConstraints currentButtonConstraints = new GridBagConstraints();
 				currentButtonConstraints.gridx = x;
 				currentButtonConstraints.gridy = y;
@@ -173,7 +185,9 @@ public class NewRaidDialog extends JDialog {
 						zoneInfoLabel.setText("You will raid : " + currentChosenRaidZone.getName());
 					}
 				});
-				currentZoneButton.setEnabled(! this.zonesUnraidable.contains(this.getZoneFromMap(x, y)));
+				currentZoneButton.setEnabled(!this.zonesUnraidable.contains(this.getZoneFromMap(x, y))
+												&& 
+											 !isMainBaseLocation(x, y));
 
 				
 				mapPanel.add(currentZoneButton, currentButtonConstraints);
@@ -227,6 +241,10 @@ public class NewRaidDialog extends JDialog {
 		
 		this.pack();
 		this.setLocationRelativeTo(null);
+	}
+	
+	private boolean isMainBaseLocation(int x, int y) {
+		return (x == mainbase.getX() && y == mainbase.getY());
 	}
 	
 	/**

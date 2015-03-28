@@ -132,7 +132,7 @@ public class Map {
 		}
 		
 		
-		// Actualizing the map
+		// Updating the map
 		for (int x = 0 ; x < this.width ; x++)
 			for (int y = 0 ; y < this.height ; y++)
 				{
@@ -140,7 +140,7 @@ public class Map {
 						this.zones[x][y].adjustZombieNumber(zombiesAddedAfterRoaming[x][y]);
 					} 
 					catch (IncoherentNumberException e) {
-						System.out.println("Erreur de code dans Map/randomZombieRoaming : Nombre de zombies incoh�rent");
+						System.out.println("Erreur de code dans Map/randomZombieRoaming : Nombre de zombies incohérent");
 						e.printStackTrace();
 					}
 				}

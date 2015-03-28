@@ -9,6 +9,7 @@ import structure.NewRaidDialog;
 import structure.RaidManagingDialog;
 
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
+import com.logicalkip.bitingdeath.bitingdeath.mapping.Base;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Map;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
 
@@ -23,15 +24,19 @@ public class SetRaidListener implements ActionListener {
 		
 	private RaidManagingDialog raidManagingDialog;
 	
+	private Base mainBase;
 	
-	public SetRaidListener(Map m, RaidManagingDialog dialog) {
+	
+	public SetRaidListener(Map m, RaidManagingDialog dialog, Base mainBase) {
 		this.map = m;
 		this.raidManagingDialog = dialog;
+		
+		this.mainBase = mainBase;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		NewRaidDialog raidDialog = new NewRaidDialog(null, "Setting a raid", true, this.raidManagingDialog.getSurvivorsNotPicked(), this.map, this.getZonesAlreadyBeingRaided());
+		NewRaidDialog raidDialog = new NewRaidDialog(null, "Setting a raid", true, this.raidManagingDialog.getSurvivorsNotPicked(), this.map, this.getZonesAlreadyBeingRaided(), this.mainBase);
 		RaidSettings userDefinedRaid = raidDialog.showRaidDialog();
 		
 		if (userDefinedRaid != null) {

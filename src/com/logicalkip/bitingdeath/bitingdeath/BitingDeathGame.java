@@ -3,7 +3,9 @@ package com.logicalkip.bitingdeath.bitingdeath;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
+import com.logicalkip.bitingdeath.bitingdeath.mapping.Base;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Map;
 import com.logicalkip.bitingdeath.bitingdeath.rules.Rules;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
@@ -43,48 +45,50 @@ public class BitingDeathGame {
 	/**
 	 * Number of rations (for now, 1 survivor needs 1 ration a day)
 	 */
-	protected int rations;
+	private int rations;
 	
 	/**
 	 * Alive survivors in the team
 	 */
-	protected List<Survivor> survivors;
+	private List<Survivor> survivors;
 	
 	/**
 	 * Day 0, Day 1, ... since the beginning of the game
 	 */
-	protected int currentDay;
+	private int currentDay;
 	
 	/**
 	 * The raids as they will be run for the current day.
 	 * /!\ You must not put a Survivor in several raids at once.
 	 * No checking will be made.
 	 */
-	protected List<RaidSettings> plannedRaids;
+	private List<RaidSettings> plannedRaids;
 	
 	/**
 	 * If the game is lost.
 	 */
-	protected boolean gameOver;
-	
+	private boolean gameOver;
+
 	/**
 	 * Ex : "All survivors are dead". Should be displayed when the game is lost.
 	 */
-	protected String gameOverMessage;
+	private String gameOverMessage;
 	
 	/**
 	 * The messages that must be displayed to the player. Ex : "X died during a mission", "X has gone because no food left", etc...
 	 * They must be displayed in FIFO order, and then removed from the list.
 	 * This does not include any game-over message. See {@link BitingDeathGame#gameOverMessage}
 	 */
-	protected List<String> messagesToDisplay;
+	private List<String> messagesToDisplay;
 	
 	/**
 	 * The map of the game, made of different Zones
 	 */
-	protected Map map;
+	private Map map;
 	
-	protected Rules rules;
+	private Rules rules;
+	
+	private Base mainBase;
 	
 				/* METHODS */
 	/**
@@ -101,12 +105,15 @@ public class BitingDeathGame {
 		this.messagesToDisplay.add("Welcome ! Survive as long as you can !");		
 		this.map = new Map(this.rules.getMapRules().getMapWidth(), this.rules.getMapRules().getMapHeight());
 		this.plannedRaids = new LinkedList<RaidSettings>();
+		
+		Random r = new Random();
+		this.mainBase = new Base(r.nextInt(this.map.getWidth()), r.nextInt(this.map.getHeight()));
 	}
 
 	/**
 	 * Returns a new list of N random survivors, N being defined in this.rules
 	 */
-	protected List<Survivor> getRandomSurvivorList() {
+	private List<Survivor> getRandomSurvivorList() {
 		List<Survivor> survivorList = new LinkedList<Survivor>();
 		List<String> namesUsed = new LinkedList<String>();
 		for (int i = 0 ; i < this.rules.getNbSurvivorsStart() ; i++) {
@@ -310,6 +317,20 @@ public class BitingDeathGame {
 
 	public int getRations() {
 		return rations;
+	}
+
+	/**
+	 * @return the mainBase
+	 */
+	public Base getMainBase() {
+		return mainBase;
+	}
+
+	/**
+	 * @param mainBase the mainBase to set
+	 */
+	public void setMainBase(Base mainBase) {
+		this.mainBase = mainBase;
 	}	
 	
 }

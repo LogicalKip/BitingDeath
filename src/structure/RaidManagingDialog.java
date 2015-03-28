@@ -83,7 +83,7 @@ public class RaidManagingDialog extends JDialog {
 		c.gridx = 0;
 		c.gridy = 0;
 		this.newRaidButton = new JButton("Add a new raid");
-		this.newRaidButton.addActionListener(new SetRaidListener(this.game.getMap(), this)); 
+		this.newRaidButton.addActionListener(new SetRaidListener(this.game.getMap(), this, this.game.getMainBase())); 
 		
 		pane.add(this.newRaidButton, c);
 		
