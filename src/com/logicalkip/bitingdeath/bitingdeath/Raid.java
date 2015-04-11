@@ -31,7 +31,7 @@ public class Raid {
 	protected int loot;
 	
 	/**
-	 * Those messages shall be added to the ones in BitingDeathGame, and displayed somehow/when after the raid
+	 * Those messages shall be added to the ones in {@link BitingDeathGame}, and displayed somehow, after the raid
 	 * Ex : "John was bitten", "Nothing was found".
 	 */
 	protected List<String> messagesToDisplayOnceRaidIsOver;
@@ -41,6 +41,11 @@ public class Raid {
 	 * This is purely informative, and those in this list can definitely still be in this.team
 	 */
 	protected List<Survivor> survivorsHurtDuringRaid;
+	
+	/**
+	 * A list of survivors found when running the raid
+	 */
+	protected List<Survivor> newSurvivorsFound;
 	
 				/* METHODS */
 	
@@ -62,20 +67,22 @@ public class Raid {
 	
 	/**
 	 * CONSTRUCTOR
-	 * @param raidSettings2
+	 * @param raidSettings
 	 */
 	public Raid(RaidSettings raidSettings) {
 		this.raidSettings = raidSettings;
 		this.loot = 0;
 		this.messagesToDisplayOnceRaidIsOver = null;
 		this.survivorsHurtDuringRaid = null;
+		this.newSurvivorsFound = null;
 	}
 
 	/**
 	 * Run the raid. Beware, as people may get hurt and/or nothing found.
 	 * CURRENT RULES : 0.5 chance per survivor to get 1 ration, 0.25 to get 2 and 0.25 nothing.
-	 * Replace messagesToDisplayOnceRaidIsOver with another list (might be empty)
-	 * Replace survivorsHurtDuringRaid with the unlucky fellows. Only writing down hurt survivors, no deleting or turning.
+	 * Replace {@link Raid#messagesToDisplayOnceRaidIsOver} with another list (might be empty)
+	 * Replace {@link Raid#survivorsHurtDuringRaid} with the unlucky fellows. Only writing down hurt survivors, no deleting or turning.
+	 * Replace {@link Raid#newSurvivorsFound} with the survivors found during this raid
 	 * Sets loot to its new value (what will be brought back to the camp).
 	 * Remove killed zombies from the raided zone.
 	 * @throws CantRunRaidException when no destination or team provided
@@ -146,6 +153,14 @@ public class Raid {
 		} catch (IncoherentNumberException e) {
 			System.err.println("Erreur de code dans Raid#run : le nombre de zombies à supprimer est incohérent");
 			e.printStackTrace();
+		}
+		
+		this.newSurvivorsFound = new LinkedList<Survivor>();
+		// A wild survivor appears !
+		if (BitingDeathGame.getRandomProbability() < 0.25) {
+			Survivor newSurvivor = new Survivor();
+			this.newSurvivorsFound.add(newSurvivor);
+			this.messagesToDisplayOnceRaidIsOver.add(newSurvivor.getName() + " was found !");
 		}
 		
 	}
@@ -232,5 +247,9 @@ public class Raid {
 	 */
 	public Zone getDestination() {
 		return this.raidSettings.getDestination();
+	}
+
+	public List<Survivor> getNewSurvivorsFound() {
+		return newSurvivorsFound;
 	}
 }

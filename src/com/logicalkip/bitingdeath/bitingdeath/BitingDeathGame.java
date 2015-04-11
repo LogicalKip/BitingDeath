@@ -9,6 +9,7 @@ import com.logicalkip.bitingdeath.bitingdeath.mapping.Base;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Map;
 import com.logicalkip.bitingdeath.bitingdeath.rules.Rules;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
+import com.logicalkip.bitingdeath.exceptions.AlreadyThereException;
 import com.logicalkip.bitingdeath.exceptions.CantRunRaidException;
 import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
 
@@ -183,8 +184,18 @@ public class BitingDeathGame {
 		
 		Iterator<Survivor> iter = deadSurvivors.iterator();
 		
-		while (iter.hasNext()) { // Removing dead survivors from the game
+		// Removing dead survivors from the game
+		while (iter.hasNext()) { 
 			this.removeSurvivorFromGame(iter.next());
+		}
+		
+		for (Survivor newSurvivor : raid.getNewSurvivorsFound()) {
+			try {
+				this.recruitNewSurvivor(newSurvivor);
+			} catch (AlreadyThereException e) {
+				e.printStackTrace();
+				this.addMessageToDisplay(e.getMessage());
+			}
 		}
 		
 		this.rations += raid.getLoot();
@@ -244,6 +255,18 @@ public class BitingDeathGame {
 			}
 		}
 		this.plannedRaids = newRaidList;
+	}
+	
+	/**
+	 * Adds a new survivor to the team
+	 * @param s the new survivor
+	 */
+	public void recruitNewSurvivor(Survivor s) throws AlreadyThereException {
+		if (this.survivors.contains(s)) {
+			throw new AlreadyThereException(s.getName() + " is already a part of the crew");
+		} else {
+			this.survivors.add(s);
+		}
 	}
 	
 	

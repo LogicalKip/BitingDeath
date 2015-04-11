@@ -7,7 +7,6 @@ import java.util.List;
 
 import listeners.SetRaidListener;
 
-import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 import com.logicalkip.bitingdeath.bitingdeath.RaidCreator;
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Base;
@@ -19,12 +18,12 @@ public class RaidMenu extends Menu implements RaidCreator {
 
 	private static final long serialVersionUID = 7594933627709899021L;
 
-	private BitingDeathGame game;
+	private BitingDeathFrame frame;
 
 	public RaidMenu(BitingDeathFrame frame) {
 		super("Raid");
 
-		this.game = frame.getGame();
+		this.frame = frame;
 
 		/**
 		 * Create a new raid from the menu bar, quicker than going to the "Manage raids" dialog
@@ -39,9 +38,9 @@ public class RaidMenu extends Menu implements RaidCreator {
 	@Override
 	public List<Survivor> getPickableRaiders() {
 		List<Survivor> res = new LinkedList<Survivor>();
-		for (Survivor s : this.game.getSurvivors()) {
+		for (Survivor s : this.frame.getGame().getSurvivors()) {
 			boolean alreadyChosen = false;
-			for (RaidSettings raid : this.game.getCurrentPlannedRaids()) {
+			for (RaidSettings raid : this.frame.getGame().getCurrentPlannedRaids()) {
 				if (raid.getTeam().contains(s)) {
 					alreadyChosen = true;
 				}
@@ -55,18 +54,18 @@ public class RaidMenu extends Menu implements RaidCreator {
 
 	@Override
 	public Base getMainBase() {
-		return this.game.getMainBase();
+		return this.frame.getGame().getMainBase();
 	}
 
 	@Override
 	public Map getMap() {
-		return this.game.getMap();
+		return this.frame.getGame().getMap();
 	}
 
 	@Override
 	public List<Zone> getZonesAlreadyBeingRaided() {
 		List<Zone> res = new LinkedList<Zone>();
-		for (RaidSettings raid : this.game.getCurrentPlannedRaids()) {
+		for (RaidSettings raid : this.frame.getGame().getCurrentPlannedRaids()) {
 			res.add(raid.getDestination());
 		}
 		return res;
@@ -74,8 +73,9 @@ public class RaidMenu extends Menu implements RaidCreator {
 
 	@Override
 	public void addRaid(RaidSettings raid) {
-		List<RaidSettings> raids = this.game.getCurrentPlannedRaids();
+		List<RaidSettings> raids = this.frame.getGame().getCurrentPlannedRaids();
 		raids.add(raid);
-		this.game.setCurrentRaidSettings(raids);
+		this.frame.getGame().setCurrentRaidSettings(raids);
+		this.frame.updateAll();
 	}
 }
