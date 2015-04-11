@@ -12,7 +12,6 @@ public class GameMenu extends Menu {
 	public GameMenu(BitingDeathFrame frame) {
 		super("Game");
 		
-		
 		this.add(createNewGameMenuItem(frame));
 	}
 	

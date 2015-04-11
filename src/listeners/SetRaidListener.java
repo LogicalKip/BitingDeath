@@ -2,16 +2,11 @@ package listeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedList;
-import java.util.List;
 
 import structure.NewRaidDialog;
-import structure.RaidManagingDialog;
 
+import com.logicalkip.bitingdeath.bitingdeath.RaidCreator;
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
-import com.logicalkip.bitingdeath.bitingdeath.mapping.Base;
-import com.logicalkip.bitingdeath.bitingdeath.mapping.Map;
-import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
 
 /**
  * Describes what to do when the "Set raid" button is clicked
@@ -20,38 +15,19 @@ import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
  */
 public class SetRaidListener implements ActionListener {
 	
-	private Map map;
-		
-	private RaidManagingDialog raidManagingDialog;
+	RaidCreator raidCreator;
 	
-	private Base mainBase;
-	
-	
-	public SetRaidListener(Map m, RaidManagingDialog dialog, Base mainBase) {
-		this.map = m;
-		this.raidManagingDialog = dialog;
-		
-		this.mainBase = mainBase;
+	public SetRaidListener(RaidCreator rc) {
+		this.raidCreator = rc;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		NewRaidDialog raidDialog = new NewRaidDialog(null, "Setting a raid", true, this.raidManagingDialog.getSurvivorsNotPicked(), this.map, this.getZonesAlreadyBeingRaided(), this.mainBase);
+		NewRaidDialog raidDialog = new NewRaidDialog(null, "Setting a raid", true, this.raidCreator.getPickableRaiders(), this.raidCreator.getMap(), this.raidCreator.getZonesAlreadyBeingRaided(), this.raidCreator.getMainBase());
 		RaidSettings userDefinedRaid = raidDialog.showRaidDialog();
 		
 		if (userDefinedRaid != null) {
-			this.raidManagingDialog.addRaid(userDefinedRaid);
+			this.raidCreator.addRaid(userDefinedRaid);
 		}
-		this.raidManagingDialog.updateAll();
-	}
-	
-	private List<Zone> getZonesAlreadyBeingRaided() {
-		List<Zone> res = new LinkedList<Zone>();
-		
-		for (RaidSettings raid : this.raidManagingDialog.getRaids()) {
-			res.add(raid.getDestination());
-		}
-		
-		return res;
 	}
 }

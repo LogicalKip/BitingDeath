@@ -21,7 +21,11 @@ import javax.swing.JTextArea;
 import listeners.SetRaidListener;
 
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
+import com.logicalkip.bitingdeath.bitingdeath.RaidCreator;
 import com.logicalkip.bitingdeath.bitingdeath.RaidSettings;
+import com.logicalkip.bitingdeath.bitingdeath.mapping.Base;
+import com.logicalkip.bitingdeath.bitingdeath.mapping.Map;
+import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
 
@@ -31,7 +35,7 @@ import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
  * @author charles
  * 
  */
-public class RaidManagingDialog extends JDialog {
+public class RaidManagingDialog extends JDialog implements RaidCreator {
 	private static final long serialVersionUID = -8667604758519407114L;
 
 	private BitingDeathGame game;
@@ -83,7 +87,7 @@ public class RaidManagingDialog extends JDialog {
 		c.gridx = 0;
 		c.gridy = 0;
 		this.newRaidButton = new JButton("Add a new raid");
-		this.newRaidButton.addActionListener(new SetRaidListener(this.game.getMap(), this, this.game.getMainBase())); 
+		this.newRaidButton.addActionListener(new SetRaidListener(this)); 
 		
 		pane.add(this.newRaidButton, c);
 		
@@ -157,8 +161,10 @@ public class RaidManagingDialog extends JDialog {
 		return this.sendData ? this.raids : null;
 	}
 	
+	@Override
 	public void addRaid(RaidSettings raid) {
 		this.raids.add(raid);
+		this.updateAll();
 	}
 	
 	public void updateAll() {
@@ -214,4 +220,32 @@ public class RaidManagingDialog extends JDialog {
 	public List<RaidSettings> getRaids() {
 		return raids;
 	}
+
+	@Override
+	public List<Survivor> getPickableRaiders() {
+		return this.getSurvivorsNotPicked();
+	}
+
+	@Override
+	public Base getMainBase() {
+		return this.game.getMainBase();
+	}
+
+	@Override
+	public Map getMap() {
+		return this.game.getMap();
+	}
+
+	@Override
+	public List<Zone> getZonesAlreadyBeingRaided() {
+		List<Zone> res = new LinkedList<Zone>();
+
+		for (RaidSettings raid : this.getRaids()) {
+			res.add(raid.getDestination());
+		}
+
+		return res;
+	}
+	
+	
 }

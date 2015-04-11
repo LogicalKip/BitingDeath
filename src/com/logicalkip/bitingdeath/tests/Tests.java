@@ -1,3 +1,4 @@
+package com.logicalkip.bitingdeath.tests;
 
 import structure.BitingDeathFrame;
 
