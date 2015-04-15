@@ -1,5 +1,12 @@
 package com.logicalkip.bitingdeath.bitingdeath.mapping;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import com.logicalkip.bitingdeath.bitingdeath.Crowbar;
+import com.logicalkip.bitingdeath.bitingdeath.Screwdriver;
+import com.logicalkip.bitingdeath.bitingdeath.Weapon;
+
 /**
  * A base where survivors are taking shelter and storing resources
  * @author charles
@@ -17,9 +24,21 @@ public class Base {
 	 */
 	private int y;
 
+	private List<Weapon> availableWeapons;
+	
 	public Base(int x, int y) {
-		this.x= x;
+		this.x = x;
 		this.y = y;
+		this.availableWeapons = this.getInitialWeapons();
+	}
+	
+	private List<Weapon> getInitialWeapons() {
+		List<Weapon> res = new LinkedList<Weapon>();
+		res.add(new Crowbar());
+		res.add(new Screwdriver());
+		res.add(new Crowbar());
+		
+		return res;
 	}
 
 	public int getX() {
@@ -39,5 +58,12 @@ public class Base {
 
 	public void setY(int y) {
 		this.y = y;
+	}
+
+	/**
+	 * @return the availableWeapons
+	 */
+	public List<Weapon> getAvailableWeapons() {
+		return availableWeapons;
 	}
 }

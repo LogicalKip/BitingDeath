@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
+import com.logicalkip.bitingdeath.bitingdeath.Weapon;
 
 /**
  * A survivor and everything related to him/her. Current weapon, HP, etc.
@@ -52,6 +53,10 @@ public class Survivor {
 	 */
 	protected Skills skills;
 	
+	/**
+	 * The weapon currently wielded by the survivor. If null, the survivor is using its bare fists and will be much less efficient
+	 */
+	protected Weapon weapon;
 				/* METHODS */
 	/**
 	 * CONSTRUCTOR
@@ -81,6 +86,7 @@ public class Survivor {
 		this.id = Survivor.survivorsCreated;
 		this.isFemale = (BitingDeathGame.getRandomProbability() > 0.5);
 		this.skills = new Skills();	
+		this.weapon = null;
 		
 		this.name = getRandomUnusedName(namesNotToUse, this.isFemale);
 		
@@ -163,6 +169,19 @@ public class Survivor {
 		res +=  " (Fighting : " + this.skills.getFightingSkill() + ") (Scavenging : " + this.skills.getScavengingSkill() + ")";
 		return res;
 	}
+	
+	/**
+	 * FIXME use fightingSkill
+	 * Returns a number showing how well the survivor would do in a fight, considering the currently carried weapon
+	 * @return a double between 0 and 1, where 1 means a perfect fighter
+	 */
+	public double getFightingEfficiency() {
+		if (this.weapon == null) {
+			return 0.2;
+		} else {
+			return this.weapon.getEfficiency();
+		}
+	}
 
 	/**
 	 * @return the skills
@@ -183,6 +202,14 @@ public class Survivor {
 	 */
 	public void improveScavengingSkill(){
 		this.skills.improveScavengingSkill();
+	}
+
+	public Weapon getWeapon() {
+		return weapon;
+	}
+
+	public void setWeapon(Weapon weapon) {
+		this.weapon = weapon;
 	}
 
 }

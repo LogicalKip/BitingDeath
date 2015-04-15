@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import listeners.RemoveRaidListener;
 import listeners.SetRaidListener;
 
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
@@ -76,6 +77,7 @@ public class RaidManagingDialog extends JDialog implements RaidCreator {
 		this.initComponent();
 		
 		this.updateAll();
+		this.setLocationRelativeTo(null);
 	}
 	
 	private void initComponent() {
@@ -201,7 +203,6 @@ public class RaidManagingDialog extends JDialog implements RaidCreator {
 		
 		this.raidListScrollPane.setViewportView(scrollableRaidListPanel);
 		this.pack();
-		this.setLocationRelativeTo(null);
 		this.validate();
 		this.repaint();	
 	}	

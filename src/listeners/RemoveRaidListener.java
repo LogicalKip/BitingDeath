@@ -1,7 +1,9 @@
-package structure;
+package listeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import structure.RaidManagingDialog;
 
 import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
 

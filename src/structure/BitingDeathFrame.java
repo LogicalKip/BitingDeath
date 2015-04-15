@@ -3,6 +3,8 @@ package structure;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -28,8 +30,6 @@ public class BitingDeathFrame extends JFrame {
 	/* 
 	 * TODO /!\ List concerning more or less the Swing implementation : 
 	 * 
-	 * Wouldn't creating new Dialogs every time (instead of reusing the same) accumulate and get slower ? Or garbage collector will get rid of them because they are of no use ?
-	 * 
 	 * Start-alone-mode
 	 * 
 	 * Pressing Esc <=> clicking cancel or |x|
@@ -40,12 +40,15 @@ public class BitingDeathFrame extends JFrame {
 	 * 
 	 * Remember where user put windows and display them same place next time
 	 */ 
-
+	
+	
 	private static final long serialVersionUID = 4518217666862978656L;
 	
 	private BitingDeathGame game;
 	
 	private JLabel foodLabel;
+	
+	private JLabel weaponsAvailableLabel;
 	
 	private JTextArea currentRaidsSettingsText;
 	
@@ -53,7 +56,6 @@ public class BitingDeathFrame extends JFrame {
 	
 	private JButton nextDayButton;
 	
-	private JButton raidButton;
 	
 	/**
 	 * Starts the graphical interface for the game.
@@ -86,37 +88,60 @@ public class BitingDeathFrame extends JFrame {
 		pane.add(this.foodLabel, c);
 		
 		
-		this.raidButton = new JButton("Manage scavenging raids");
+		this.weaponsAvailableLabel = new JLabel();
+		c.weightx = 0.5;
+		c.weighty = 1;
+		c.fill = GridBagConstraints.NONE;
+		c.gridx = 0;
+		c.gridy = 1;
+		c.anchor = GridBagConstraints.NORTH;
+		pane.add(this.weaponsAvailableLabel, c);
+		
+		c.gridy = 0;
+		
+		JButton survManageButton = new JButton("Manage survivors");
 		c.gridx = 1;
-		pane.add(this.raidButton, c);
+		pane.add(survManageButton, c);
+		
+		JButton raidButton = new JButton("Manage scavenging raids");
+		c.gridx = 2;
+		pane.add(raidButton, c);
 
 		this.nextDayButton = new JButton("Next day");
-		c.gridx = 2;
+		c.gridx = 3;
 		pane.add(this.nextDayButton, c);
 
-	    this.currentRaidsSettingsText = createTextArea();
-	    c.gridy = 1;
-	    c.gridx = 1;
-	    c.gridwidth = 2;
-	    c.weighty = 1;
-	    c.weightx = 1;
-	    pane.add(this.currentRaidsSettingsText, c);
-	    
 	    this.survivorInfoText = createTextArea();
-	    c.gridy = 1;
+	    c.gridy = 2;
 	    c.gridx = 0;
 	    c.gridwidth = 1;
 	    c.weighty = 1;
 	    pane.add(this.survivorInfoText, c);
+		
+	    this.currentRaidsSettingsText = createTextArea();
+	    c.gridy = 2;
+	    c.gridx = 1;
+	    c.gridwidth = 3;
+	    c.weighty = 1;
+	    c.weightx = 1;
+	    pane.add(this.currentRaidsSettingsText, c);
+	    
+	
 
-	    this.raidButton.addActionListener(new ManageRaidListener(this));
+	    raidButton.addActionListener(new ManageRaidListener(this));
 	    this.nextDayButton.addActionListener(new NextDayListener(this));
+	    survManageButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new SurvivorsManagingDialog(null, "Manage survivors", true, game).setVisible(true);
+			}
+		});
 
 	    this.updateAll();
+		this.setLocationRelativeTo(null);
+	    
 		this.setVisible(true);
 
-		
-		
 		this.showAllMessages();
 	}
 	
@@ -141,11 +166,12 @@ public class BitingDeathFrame extends JFrame {
 		}
 		
 		this.pack();
-		this.setLocationRelativeTo(null);
 	}
 	
 	public void updateDisplayedData() {
 		this.foodLabel.setText("Rations left : " + this.game.getRations());
+		
+		this.weaponsAvailableLabel.setText("Unused weapons : " + this.game.getMainBase().getAvailableWeapons().size());
 		
 		// Survivor info
 		String survText = "Survivors (" + this.game.getSurvivors().size() + "):\n";

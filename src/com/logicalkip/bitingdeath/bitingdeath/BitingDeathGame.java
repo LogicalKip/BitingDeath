@@ -10,17 +10,19 @@ import com.logicalkip.bitingdeath.bitingdeath.mapping.Map;
 import com.logicalkip.bitingdeath.bitingdeath.rules.Rules;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 import com.logicalkip.bitingdeath.exceptions.AlreadyThereException;
+import com.logicalkip.bitingdeath.exceptions.CantEquipWeaponException;
 import com.logicalkip.bitingdeath.exceptions.CantRunRaidException;
 import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
+import com.logicalkip.bitingdeath.exceptions.NoWeaponException;
 
 
 /* 
  * TODO /!\ Idea list to improve the game : 
  * Being able to build stuff on zones (barricades, bridges in swamp, towers (not the auto-shoot style, but rather to improve sight/accuracy), etc) 
  * 
- * Recruiting
- * 
  * Finding weapons/tools (either to equip or just improving overall chances)
+ * 
+ * Z attacking the base (not/hardly spawned ?)
  * 
  * Find a way to be sure that a dying survivor is removed from all lists/var, even a forgotten or not so useful one (leader of survivors, last team used, raids, ...)
  * 		NOTES :
@@ -267,6 +269,64 @@ public class BitingDeathGame {
 		} else {
 			this.survivors.add(s);
 		}
+	}
+	
+	/**
+	 * Makes survivor equip targeted weapon from the main base and stores the (if any) previously equipped weapon in base
+	 * @param survivor must be in {@link BitingDeathGame#survivors}
+	 * @param weapon must be in base and not already used by a survivor {@link Base#getAvailableWeapons()}
+	 * @throws CantEquipWeaponException if any of the above is not respected
+	 */
+	public void equipWeapon(Survivor survivor, Weapon weapon) throws CantEquipWeaponException {
+		if (! this.survivors.contains(survivor)) {
+			throw new CantEquipWeaponException(CantEquipWeaponException.notInTheTeam(survivor));
+		} else if (! this.mainBase.getAvailableWeapons().contains(weapon)) {
+			throw new CantEquipWeaponException("Weapon must be one of those stored in base to equip");
+		} else {
+			Survivor owner = this.alreadyEquipped(weapon);
+			if (owner != null) { 
+				throw new CantEquipWeaponException("Weapon is already equipped by " + owner.getName());
+			} else {
+				Weapon oldWeapon = survivor.getWeapon();
+				
+				this.mainBase.getAvailableWeapons().remove(weapon);
+				survivor.setWeapon(weapon);
+				
+				if (oldWeapon != null) {
+					this.mainBase.getAvailableWeapons().add(oldWeapon);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Makes the survivor take off his/her current Weapon and stores it in the main base
+	 * @param s the survivor whose weapon must be unequipped
+	 * @throws CantEquipWeaponException if the survivor isn't in {@link BitingDeathGame#survivors}
+	 * @throws NoWeaponException if the survivor has no weapon to take off
+	 */
+	public void unequipWeapon(Survivor s) throws CantEquipWeaponException, NoWeaponException {
+		Weapon w = s.getWeapon();
+		if (! this.survivors.contains(s)) {
+			throw new CantEquipWeaponException(CantEquipWeaponException.notInTheTeam(s));
+		} else if (w == null) {
+			throw new NoWeaponException();
+		} else {
+			s.setWeapon(null);
+			this.mainBase.getAvailableWeapons().add(w);
+		}
+	}
+	
+	/**
+	 * Returns a (hopefully the) survivor from the team having that weapon equipped or null if equipped by no one in {@link BitingDeathGame#survivors}
+	 */
+	private Survivor alreadyEquipped(Weapon weapon) {		
+		for (Survivor s : this.survivors) {
+			if (s.getWeapon() == weapon) {
+				return s;
+			}
+		}
+		return null;
 	}
 	
 	

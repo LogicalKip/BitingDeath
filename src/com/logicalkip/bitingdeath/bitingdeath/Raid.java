@@ -78,6 +78,7 @@ public class Raid {
 	}
 
 	/**
+	 * TODO re-think the rules for raiding
 	 * Run the raid. Beware, as people may get hurt and/or nothing found.
 	 * CURRENT RULES : 0.5 chance per survivor to get 1 ration, 0.25 to get 2 and 0.25 nothing.
 	 * Replace {@link Raid#messagesToDisplayOnceRaidIsOver} with another list (might be empty)
@@ -183,7 +184,10 @@ public class Raid {
 			if (actualZombiesInTheZone > 100)
 				zombiesUsedInCalculing = 100;
 			
-			survivingChances = 0.99 / (zombiesUsedInCalculing / this.raidSettings.getTeam().size());
+			survivingChances = (0.99 / 
+									(zombiesUsedInCalculing / this.raidSettings.getTeam().size())   
+							   )
+							* survivor.getFightingEfficiency();
 		}
 		
 		return survivingChances;
@@ -247,7 +251,7 @@ public class Raid {
 	 */
 	public Zone getDestination() {
 		return this.raidSettings.getDestination();
-	}
+	} 
 
 	public List<Survivor> getNewSurvivorsFound() {
 		return newSurvivorsFound;
