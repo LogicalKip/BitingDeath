@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -107,11 +106,8 @@ public class NewRaidDialog extends JDialog {
 		survivorsPanel.setLayout(new GridBagLayout());
 		
 		this.willBePartOfTheTeam = new JCheckBox[this.availableSurvivors.size()];
-		Iterator<Survivor> iterator = this.availableSurvivors.iterator();
 		int i = 0;
-		while (iterator.hasNext()) {
-			Survivor currentSurvivor = iterator.next();
-			
+		for (Survivor currentSurvivor : this.availableSurvivors) {
 			willBePartOfTheTeam[i] = new JCheckBox();
 
 			GridBagConstraints constraints;

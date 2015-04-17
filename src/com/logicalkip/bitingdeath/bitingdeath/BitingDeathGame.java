@@ -1,6 +1,5 @@
 package com.logicalkip.bitingdeath.bitingdeath;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -12,7 +11,6 @@ import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 import com.logicalkip.bitingdeath.exceptions.AlreadyThereException;
 import com.logicalkip.bitingdeath.exceptions.CantEquipWeaponException;
 import com.logicalkip.bitingdeath.exceptions.CantRunRaidException;
-import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
 import com.logicalkip.bitingdeath.exceptions.NoWeaponException;
 
 
@@ -20,9 +18,13 @@ import com.logicalkip.bitingdeath.exceptions.NoWeaponException;
  * TODO /!\ Idea list to improve the game : 
  * Being able to build stuff on zones (barricades, bridges in swamp, towers (not the auto-shoot style, but rather to improve sight/accuracy), etc) 
  * 
- * Finding weapons/tools (either to equip or just improving overall chances)
+ * Finding weapons
+ * 
+ * NPC : Limited amount of survivors hiding in every zone. May not want to come along. Personalities. Meta-game to make them fight zombies and possibly die(turn)
  * 
  * Z attacking the base (not/hardly spawned ?)
+ * 
+ * Strategies/philosophies to choose and to follow : come back if there are too many Z/get in there no matter what, etc (Strategy design pattern)
  * 
  * Find a way to be sure that a dying survivor is removed from all lists/var, even a forgotten or not so useful one (leader of survivors, last team used, raids, ...)
  * 		NOTES :
@@ -134,7 +136,6 @@ public class BitingDeathGame {
 	 * @throws CantRunRaidException 
 	 */
 	public void nextDay() throws CantRunRaidException {
-		
 		for (RaidSettings currRaid : this.plannedRaids)
 			this.runRaid(currRaid);
 				
@@ -177,18 +178,14 @@ public class BitingDeathGame {
 		this.messagesToDisplay.addAll(raid.getMessagesToDisplayOnceRaidIsOver());
 		List<Survivor> deadSurvivors = raid.getSurvivorsHurtDuringRaid();
 		
-		try {
-			raid.getDestination().addZombies(deadSurvivors.size());
-		} catch (IncoherentNumberException e) {
-			System.err.println("Erreur de code dans BitingDeathGame/runRaid : le nombre de zombies à ajouter est incohérent");
-			e.printStackTrace();
-		}
-		
-		Iterator<Survivor> iter = deadSurvivors.iterator();
-		
 		// Removing dead survivors from the game
-		while (iter.hasNext()) { 
-			this.removeSurvivorFromGame(iter.next());
+		for (Survivor poorBastard : deadSurvivors) { 
+			this.addMessageToDisplay(poorBastard.getName() + " has been bitten during the raid. " +
+									(poorBastard.isFemale() ? "She" : "He") +
+									" was put out of " +
+									(poorBastard.isFemale() ? "her" : "his") + " misery."
+					);
+			this.removeSurvivorFromGame(poorBastard);
 		}
 		
 		for (Survivor newSurvivor : raid.getNewSurvivorsFound()) {

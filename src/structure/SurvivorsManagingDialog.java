@@ -1,5 +1,6 @@
 package structure;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -62,7 +64,8 @@ public class SurvivorsManagingDialog extends JDialog {
 		/* Survivors names + radio buttons */
 		c.gridx = 0;
 		c.gridy = 0;
-		c.gridheight = 1;
+		c.gridheight = GridBagConstraints.REMAINDER;
+		
 		
 		ButtonGroup buttonGroup = new ButtonGroup();
 		this.survSelectButtons = new LinkedList<JRadioButton>();
@@ -83,7 +86,9 @@ public class SurvivorsManagingDialog extends JDialog {
 			survSelectPanel.add(radioButton);
 		}		
 		this.survSelectButtons.get(0).setSelected(true);
+		survSelectPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		pane.add(survSelectPanel, c);
+		c.gridheight = 1;
 		
 		
 		/* Current weapon */
@@ -110,6 +115,7 @@ public class SurvivorsManagingDialog extends JDialog {
 		c.gridy = 1; 
 		this.availableWeaponsPanel = new JPanel();
 		this.availableWeaponsPanel.setLayout(new GridBagLayout());
+		this.availableWeaponsPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		pane.add(this.availableWeaponsPanel, c);
 		
 		/* Skills */

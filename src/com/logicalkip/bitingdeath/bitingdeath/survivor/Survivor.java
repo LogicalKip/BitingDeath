@@ -212,4 +212,8 @@ public class Survivor {
 		this.weapon = weapon;
 	}
 
+	public boolean isFemale() {
+		return isFemale;
+	}
+
 }

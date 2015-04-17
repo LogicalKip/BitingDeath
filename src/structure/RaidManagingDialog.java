@@ -172,35 +172,46 @@ public class RaidManagingDialog extends JDialog implements RaidCreator {
 	public void updateAll() {
 		this.newRaidButton.setEnabled(this.getSurvivorsNotPicked().size() > 0);
 		
-		
+		//FIXME align each category (names, zone, button)
 		JPanel scrollableRaidListPanel = new JPanel();
 		scrollableRaidListPanel.setLayout(new BoxLayout(scrollableRaidListPanel, BoxLayout.Y_AXIS));
 		for (RaidSettings raid : this.raids) {
 			JPanel panel = new JPanel();
+			panel.setLayout(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+			c.gridy = 0;
+			c.ipadx = 10;
+
+			
+			c.gridx = 0;
+			c.anchor = GridBagConstraints.WEST;
 			String survNames = "";
 			for (Survivor s : raid.getTeam()) {
 				survNames += s.getName() + "\n";						
 			}
-			JTextArea survNamesArea = new JTextArea(survNames);
+			JTextArea survNamesArea = new JTextArea(survNames.trim());
 			survNamesArea.setEditable(false);
 			survNamesArea.setOpaque(false);
-			panel.add(survNamesArea);
+			panel.add(survNamesArea, c);
 			
+			c.gridx = 1;
+			c.anchor = GridBagConstraints.CENTER;
 			JTextArea destinationArea = new JTextArea(raid.getDestination().getName());
 			destinationArea.setEditable(false);
 			destinationArea.setOpaque(false);
-			panel.add(destinationArea);
+			panel.add(destinationArea, c);
 			
-			
+			c.gridx = 2;
+			c.anchor = GridBagConstraints.EAST;
 			JButton deleteButton = new JButton("Delete");
 			deleteButton.addActionListener(new RemoveRaidListener(this.raids.indexOf(raid), this));
-			panel.add(deleteButton);
+			panel.add(deleteButton, c);
 			
 			panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			
 			scrollableRaidListPanel.add(panel);
 		}
 
-		
 		this.raidListScrollPane.setViewportView(scrollableRaidListPanel);
 		this.pack();
 		this.validate();

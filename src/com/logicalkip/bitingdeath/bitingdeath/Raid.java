@@ -1,6 +1,5 @@
 package com.logicalkip.bitingdeath.bitingdeath;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,18 +17,18 @@ import com.logicalkip.bitingdeath.exceptions.IncoherentNumberException;
  *
  */
 public class Raid {
-	
-				/* ATTRIBUTES */ 	
+
+	/* ATTRIBUTES */ 	
 	/**
 	 * Info chosen by the player : which survivors, raiding which Zone...
 	 */
 	protected RaidSettings raidSettings; 
-	
+
 	/**
 	 * Last found loot in this raid.
 	 */
 	protected int loot;
-	
+
 	/**
 	 * Those messages shall be added to the ones in {@link BitingDeathGame}, and displayed somehow, after the raid
 	 * Ex : "John was bitten", "Nothing was found".
@@ -41,14 +40,14 @@ public class Raid {
 	 * This is purely informative, and those in this list can definitely still be in this.team
 	 */
 	protected List<Survivor> survivorsHurtDuringRaid;
-	
+
 	/**
 	 * A list of survivors found when running the raid
 	 */
 	protected List<Survivor> newSurvivorsFound;
-	
-				/* METHODS */
-	
+
+	/* METHODS */
+
 	/**
 	 * CONSTRUCTOR
 	 * Create a new empty team, and no destination.
@@ -56,7 +55,7 @@ public class Raid {
 	public Raid() {
 		this(new LinkedList<Survivor>(), null);
 	}
-	
+
 	/**
 	 * CONSTRUCTOR
 	 * @param team Create a new empty team if null
@@ -64,7 +63,7 @@ public class Raid {
 	public Raid(List<Survivor> team, Zone zoneDest) {
 		this(new RaidSettings(zoneDest, team));
 	}
-	
+
 	/**
 	 * CONSTRUCTOR
 	 * @param raidSettings
@@ -78,13 +77,11 @@ public class Raid {
 	}
 
 	/**
-	 * TODO re-think the rules for raiding
 	 * Run the raid. Beware, as people may get hurt and/or nothing found.
-	 * CURRENT RULES : 0.5 chance per survivor to get 1 ration, 0.25 to get 2 and 0.25 nothing.
 	 * Replace {@link Raid#messagesToDisplayOnceRaidIsOver} with another list (might be empty)
-	 * Replace {@link Raid#survivorsHurtDuringRaid} with the unlucky fellows. Only writing down hurt survivors, no deleting or turning.
+	 * Replace {@link Raid#survivorsHurtDuringRaid} with the unlucky fellows  (might be empty). Only writing down hurt survivors, no deleting or turning.
 	 * Replace {@link Raid#newSurvivorsFound} with the survivors found during this raid
-	 * Sets loot to its new value (what will be brought back to the camp).
+	 * Sets {@link Raid#loot} to its new value (what will be brought back to the camp).
 	 * Remove killed zombies from the raided zone.
 	 * @throws CantRunRaidException when no destination or team provided
 	 * @see com.logicalkip.bitingdeathandroid.bitingdeath.Raid#chancesOfSurvivingTheRaid(Survivor, int)
@@ -92,62 +89,79 @@ public class Raid {
 	public void run() throws CantRunRaidException { 
 		if (this.raidSettings.getDestination() == null)
 			throw new CantRunRaidException(CantRunRaidBecause.DESTINATION_NULL);
-		
 		if (this.raidSettings.getTeam() == null || this.raidSettings.getTeam().isEmpty())
 			throw new CantRunRaidException(CantRunRaidBecause.NO_SURVIVORS);
-		
-		
-		int lootFound = 0, zombiesKilled = 0, 
-				zombiesRoamingTheZone = this.raidSettings.getDestination().getZombiesLeft(), 
-				nbOfSurvivorsAtFirst = this.raidSettings.getTeam().size();
-		double rand;
-		
-		Iterator<Survivor> teamIterator = this.raidSettings.getTeam().iterator();
-		
+
+		int zombiesKilled, zombiesAtFirst = this.raidSettings.getDestination().getZombiesLeft();
 		this.messagesToDisplayOnceRaidIsOver = new LinkedList<String>();
 		this.survivorsHurtDuringRaid = new LinkedList<Survivor>();
+		
+		zombiesKilled = this.clearArea();
+		this.loot = this.lootArea();
 
-		//TODO looting before or after killing zombies (% danger) ? 
-		while (teamIterator.hasNext()) {
-			Survivor currentSurvivor = teamIterator.next();
-			if (BitingDeathGame.getRandomProbability() > chancesOfSurvivingTheRaid(currentSurvivor, zombiesRoamingTheZone)) {
-				// Too bad.
-				this.survivorsHurtDuringRaid.add(currentSurvivor);
-				this.messagesToDisplayOnceRaidIsOver.add(currentSurvivor.getName() + " has been bitten while running the raid");
-			} else {// Still alive, may proceed to scavenging
-				rand = BitingDeathGame.getRandomProbability();
-				if (rand > 0.75)
-					lootFound += 2;
-				else if (rand > 0.25)
-					lootFound++;
-			}
-		}
-
-		// LOOT !
-		this.loot = lootFound;
-		if (lootFound == 0 && this.survivorsHurtDuringRaid.size() != this.raidSettings.getTeam().size())
-			this.messagesToDisplayOnceRaidIsOver.add("Nothing interesting was brought back from " + this.raidSettings.getDestination().getName());
-
-		// Bashing some Zeds, even hurt survivors did.
-		if (nbOfSurvivorsAtFirst > zombiesRoamingTheZone)
-			zombiesKilled = zombiesRoamingTheZone;
-		else
-			zombiesKilled = nbOfSurvivorsAtFirst;
-
-		if (zombiesRoamingTheZone == 0)
+		this.addLootRelatedMessages();
+		this.addZombieRelatedMessages(zombiesAtFirst, zombiesKilled);
+		
+		this.encouterNPCs();
+		
+		this.improveSkills(zombiesKilled);
+	}
+	
+	/**
+	 * Adds messages to {@link Raid#messagesToDisplayOnceRaidIsOver} concerning the loot freshly found
+	 */
+	private void addLootRelatedMessages() {
+		if (this.loot == 0 && this.survivorsHurtDuringRaid.size() != this.raidSettings.getTeam().size())
+			this.messagesToDisplayOnceRaidIsOver.add("Nothing was found in " + this.raidSettings.getDestination().getName());
+	}
+	
+	/**
+	 * Adds messages to {@link Raid#messagesToDisplayOnceRaidIsOver} concerning the zombies encountered
+	 * @param zombiesAtFirst How many zombies were in the raided zone when the team arrived
+	 * @param zombiesKilled  How many zombies were killed by the team
+	 */
+	private void addZombieRelatedMessages(int zombiesAtFirst, int zombiesKilled) {
+		if (zombiesAtFirst == 0)
 			this.messagesToDisplayOnceRaidIsOver.add("No zombies were encoutered");
 		else if (zombiesKilled == 1)
-			this.messagesToDisplayOnceRaidIsOver.add("One unlucky zombie was killed");
+			this.messagesToDisplayOnceRaidIsOver.add("One lonely zombie was killed");
 		else 
 			this.messagesToDisplayOnceRaidIsOver.add(zombiesKilled + " zombies have been killed");
-
-		teamIterator = this.raidSettings.getTeam().iterator();
-		while(teamIterator.hasNext()) {
-			Survivor currSurvivor = teamIterator.next();
-			if (zombiesKilled > 0)
-				currSurvivor.improveFightingSkill();
-			currSurvivor.improveScavengingSkill();
+	}
+	
+	/**
+	 * Gives a chance to every survivor in the raid to scavenge something
+	 * FIXME use scavenging skill
+	 * @return how much food was found
+	 */
+	private int lootArea() {
+		int lootFound = 0;
+		for (@SuppressWarnings("unused") Survivor currentSurvivor : this.raidSettings.getTeam()) {
+			double rand = BitingDeathGame.getRandomProbability();
+			if (rand > 0.75)
+				lootFound += 2;
+			else if (rand > 0.25)
+				lootFound++;
 		}
+		return lootFound;
+	}
+
+	/**
+	 * Kill the zombies (before looting) and removes them from the zone.
+	 * Survivors may be bitten, but not overwhelmed and eaten. They will still be able to return home with the loot.
+	 * FIXME make it possible to die without returning home, and not "kill all zombies no matter what". Update messages.
+	 * @return the number of zombies killed
+	 */
+	private int clearArea() {
+		int zombiesAtFirst = this.raidSettings.getDestination().getZombiesLeft();
+		int zombiesKilled;
+		for (Survivor s : this.raidSettings.getTeam()) {
+			if (BitingDeathGame.getRandomProbability() > chancesOfSurvivingTheRaid(s, zombiesAtFirst)) {
+				// Bitten
+				this.survivorsHurtDuringRaid.add(s);
+			} 
+		}
+		zombiesKilled = zombiesAtFirst;
 
 		try {
 			this.raidSettings.getDestination().removeZombies(zombiesKilled);
@@ -155,7 +169,14 @@ public class Raid {
 			System.err.println("Erreur de code dans Raid#run : le nombre de zombies à supprimer est incohérent");
 			e.printStackTrace();
 		}
-		
+
+		return zombiesKilled;
+	}
+
+	/**
+	 * Gives a chance to meet and recruit other survivors in the raided zone
+	 */
+	private void encouterNPCs() {
 		this.newSurvivorsFound = new LinkedList<Survivor>();
 		// A wild survivor appears !
 		if (BitingDeathGame.getRandomProbability() < 0.25) {
@@ -163,7 +184,18 @@ public class Raid {
 			this.newSurvivorsFound.add(newSurvivor);
 			this.messagesToDisplayOnceRaidIsOver.add(newSurvivor.getName() + " was found !");
 		}
-		
+	}
+
+	/**
+	 * Improve the skills of each survivor, according to what was done
+	 * @param zombiesKilled the number of zombies killed (globally) during the raid
+	 */
+	private void improveSkills(int zombiesKilled) {
+		for (Survivor currSurvivor : this.raidSettings.getTeam()) {
+			if (zombiesKilled > 0)
+				currSurvivor.improveFightingSkill();
+			currSurvivor.improveScavengingSkill();
+		}
 	}
 
 	/**
@@ -183,16 +215,16 @@ public class Raid {
 		{
 			if (actualZombiesInTheZone > 100)
 				zombiesUsedInCalculing = 100;
-			
+
 			survivingChances = (0.99 / 
-									(zombiesUsedInCalculing / this.raidSettings.getTeam().size())   
-							   )
-							* survivor.getFightingEfficiency();
+					(zombiesUsedInCalculing / this.raidSettings.getTeam().size())   
+					)
+					* survivor.getFightingEfficiency();
 		}
-		
+
 		return survivingChances;
 	}
-	
+
 	/**
 	 * Add a Survivor to the team.
 	 * @param newSurvivor
@@ -200,7 +232,7 @@ public class Raid {
 	public void addSurvivor(Survivor newSurvivor) {
 		this.raidSettings.getTeam().add(newSurvivor);
 	}
-	
+
 	/**
 	 * Remove the specified survivor from the team. Does nothing if the param is null or not in the list.
 	 * @param survivorToRemove must "equals" the one in the list to remove. 
@@ -208,11 +240,11 @@ public class Raid {
 	public void removeSurvivor(Survivor survivorToRemove) {
 		this.raidSettings.getTeam().remove(survivorToRemove);
 	}
-	
-	
-	
-				/* GETTERS | SETTERS */
-	
+
+
+
+	/* GETTERS | SETTERS */
+
 	/**
 	 * Return the loot. 
 	 * @return 0 if nothing found or the raid is still not run.
@@ -220,14 +252,13 @@ public class Raid {
 	public int getLoot() {
 		return this.loot;
 	}
-	
+
 	@Override
 	public String toString() {
 		String res = "";
 		res += this.raidSettings.getTeam().size() + " survivors : \n";
-		Iterator <Survivor> i = this.raidSettings.getTeam().iterator();
-		while (i.hasNext())
-			res += "\t" + i.next().toString() + "\n";
+		for (Survivor i : this.raidSettings.getTeam())
+			res += "\t" + i.toString() + "\n";
 		res += "Loot : " + this.loot;
 		return res;
 	}

@@ -38,6 +38,8 @@ public class BitingDeathFrame extends JFrame {
 	 * 
 	 * Use pictures (for skills, map, ?)
 	 * 
+	 * Display messages the Rebuild way : display all those linked to a same raid together. Maybe use arrows to navigate back to the previous messages, and a skip button
+	 * 
 	 * Remember where user put windows and display them same place next time
 	 */ 
 	
@@ -134,6 +136,7 @@ public class BitingDeathFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				new SurvivorsManagingDialog(null, "Manage survivors", true, game).setVisible(true);
+				updateAll();
 			}
 		});
 
