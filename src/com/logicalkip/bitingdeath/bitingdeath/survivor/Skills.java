@@ -3,7 +3,7 @@ package com.logicalkip.bitingdeath.bitingdeath.survivor;
 import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 
 /**
- * Survivor skills. They improve when used, up to Skills.LEVEL_MAX,
+ * Survivor skills. They improve when used, up to {@link Skills#LEVEL_MAX},
  * and represent how skilled a survivor is
  * in a field : fighting, scavenging, etc.
  * Every survivor has its own Skills.
@@ -12,21 +12,21 @@ import com.logicalkip.bitingdeath.bitingdeath.BitingDeathGame;
 public class Skills {
 	
 	/**
-	 * Every skill is between LEVEL_MIN and this.
+	 * Every skill is between {@link Skills#LEVEL_MIN} and this.
 	 * No one can get better than LEVEL_MAX.
 	 */
 	public final static int LEVEL_MAX = 100;
 	
 	/**
-	 * Every skill is between LEVEL_MAX and this.
+	 * Every skill is between {@link Skills#LEVEL_MAX} and this.
 	 * The worse skill level imaginable would be LEVEL_MIN.
 	 */
 	public final static int LEVEL_MIN = 1;
 	
 	/**
-	 * No survivor will start the game being worse than STARTING_MIN_LEVEL.
+	 * No survivor will start the game being worse than {@link Skills#STARTING_MIN_LEVEL}.
 	 * This is true with any skill.
-	 * Must be < LEVEL_MAX. No kidding.
+	 * Must be < {@link Skills#LEVEL_MAX}. No kidding.
 	 */
 	private final static int STARTING_MIN_LEVEL = 10;
 	
@@ -49,7 +49,7 @@ public class Skills {
 	
 	/**
 	 * Not every survivor begins with the same skill levels
-	 * @return a random number between LEVEL_MIN and LEVEL_MAX,
+	 * @return a random number between {@link Skills#LEVEL_MIN} and {@link Skills#LEVEL_MAX},
 	 * to initialize a skill.
 	 */
 	@SuppressWarnings("unused") // in case consts were changed, thus perhaps returning > LEVEL_MAX

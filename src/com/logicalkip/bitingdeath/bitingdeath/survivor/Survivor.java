@@ -89,8 +89,6 @@ public class Survivor {
 		this.weapon = null;
 		
 		this.name = getRandomUnusedName(namesNotToUse, this.isFemale);
-		
-	
 	}
 	
 	/**
@@ -171,16 +169,28 @@ public class Survivor {
 	}
 	
 	/**
-	 * FIXME use fightingSkill
 	 * Returns a number showing how well the survivor would do in a fight, considering the currently carried weapon
 	 * @return a double between 0 and 1, where 1 means a perfect fighter
 	 */
 	public double getFightingEfficiency() {
+		double res;
 		if (this.weapon == null) {
-			return 0.2;
+			res = 0.2;
 		} else {
-			return this.weapon.getEfficiency();
+			res = this.weapon.getEfficiency();
 		}
+		
+		final int X = this.skills.getFightingSkill(), MIN = Skills.LEVEL_MIN, MAX = Skills.LEVEL_MAX; 
+		res *= (1 + ((X - MIN) / ((double) (MAX - MIN)))); 
+		
+		if (res > 1) {
+			res = 1;
+		}
+		
+		System.out.println(((X - MIN) / ((double) (MAX - MIN))));
+		System.out.println("Fighting efficiency = " + res);
+		
+		return res;
 	}
 
 	/**

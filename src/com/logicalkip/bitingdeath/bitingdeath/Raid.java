@@ -2,8 +2,10 @@ package com.logicalkip.bitingdeath.bitingdeath;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import com.logicalkip.bitingdeath.bitingdeath.mapping.Zone;
+import com.logicalkip.bitingdeath.bitingdeath.survivor.Skills;
 import com.logicalkip.bitingdeath.bitingdeath.survivor.Survivor;
 import com.logicalkip.bitingdeath.exceptions.CantRunRaidBecause;
 import com.logicalkip.bitingdeath.exceptions.CantRunRaidException;
@@ -78,66 +80,100 @@ public class Raid {
 
 	/**
 	 * Run the raid. Beware, as people may get hurt and/or nothing found.
+	 * TODO the survivors are supposedly looting together, which is therefore safer but gets less loot.
 	 * Replace {@link Raid#messagesToDisplayOnceRaidIsOver} with another list (might be empty)
 	 * Replace {@link Raid#survivorsHurtDuringRaid} with the unlucky fellows  (might be empty). Only writing down hurt survivors, no deleting or turning.
 	 * Replace {@link Raid#newSurvivorsFound} with the survivors found during this raid
 	 * Sets {@link Raid#loot} to its new value (what will be brought back to the camp).
 	 * Remove killed zombies from the raided zone.
 	 * @throws CantRunRaidException when no destination or team provided
-	 * @see com.logicalkip.bitingdeathandroid.bitingdeath.Raid#chancesOfSurvivingTheRaid(Survivor, int)
+	 * @see {@link Raid#chancesOfSurvivingTheRaid(Survivor, int)}
 	 */
 	public void run() throws CantRunRaidException { 
 		if (this.raidSettings.getDestination() == null)
 			throw new CantRunRaidException(CantRunRaidBecause.DESTINATION_NULL);
 		if (this.raidSettings.getTeam() == null || this.raidSettings.getTeam().isEmpty())
 			throw new CantRunRaidException(CantRunRaidBecause.NO_SURVIVORS);
+		
+		final int TOO_MANY_ZOMBIES = 10;//TODO parameter that can be changed by the user
 
-		int zombiesKilled, zombiesAtFirst = this.raidSettings.getDestination().getZombiesLeft();
+		int zombiesKilled, zombiesInWholeZoneAtFirst = this.raidSettings.getDestination().getZombiesLeft();
 		this.messagesToDisplayOnceRaidIsOver = new LinkedList<String>();
 		this.survivorsHurtDuringRaid = new LinkedList<Survivor>();
+		this.newSurvivorsFound = new LinkedList<Survivor>();
 		
-		zombiesKilled = this.clearArea();
-		this.loot = this.lootArea();
+		int zombiesAboutToEncouter = someOfThem(zombiesInWholeZoneAtFirst);
+		
+		if (zombiesAboutToEncouter >= TOO_MANY_ZOMBIES) {
+			nopeNopeNope(zombiesAboutToEncouter);
+		} else {
+			zombiesKilled = this.clearArea(zombiesAboutToEncouter);
+			this.loot = this.lootArea();
 
-		this.addLootRelatedMessages();
-		this.addZombieRelatedMessages(zombiesAtFirst, zombiesKilled);
+			this.addLootRelatedMessages();
+			this.addZombieRelatedMessages(zombiesAboutToEncouter, zombiesKilled);
+			
+			encouterNPCs();
+			
+			improveSkills(zombiesKilled);
+		}
+	}
+	
+	/**
+	 * @param nbZombies >= return value >= 0. "them"
+	 * @return a number representing a subgroup of the zombies
+	 */
+	int someOfThem(int nbZombies) {
+		return (int) Math.ceil(Math.random() * nbZombies);
+	}
+	
+	/**
+	 * The team thinks it's better to not even try to loot, because they have seen too many zombies wandering around.
+	 * @param z the number of zombies seen by the team in the zone before looting
+	 */
+	private void nopeNopeNope(int z) {				
+		int estimatedFloor = (int) Math.floor(((double)z) / 10.0);
+		estimatedFloor *= 10;
 		
-		this.encouterNPCs();
-		
-		this.improveSkills(zombiesKilled);
+		this.messagesToDisplayOnceRaidIsOver.add("It seemed safer to retreat, there were maybe " + estimatedFloor + " or " + (estimatedFloor + 10) + " zeds !");
 	}
 	
 	/**
 	 * Adds messages to {@link Raid#messagesToDisplayOnceRaidIsOver} concerning the loot freshly found
 	 */
 	private void addLootRelatedMessages() {
-		if (this.loot == 0 && this.survivorsHurtDuringRaid.size() != this.raidSettings.getTeam().size())
+		if (this.loot == 0)
 			this.messagesToDisplayOnceRaidIsOver.add("Nothing was found in " + this.raidSettings.getDestination().getName());
 	}
 	
 	/**
 	 * Adds messages to {@link Raid#messagesToDisplayOnceRaidIsOver} concerning the zombies encountered
-	 * @param zombiesAtFirst How many zombies were in the raided zone when the team arrived
+	 * @param zombiesEncoutered How many zombies were met by the team
 	 * @param zombiesKilled  How many zombies were killed by the team
 	 */
-	private void addZombieRelatedMessages(int zombiesAtFirst, int zombiesKilled) {
-		if (zombiesAtFirst == 0)
+	private void addZombieRelatedMessages(int zombiesEncoutered, int zombiesKilled) {
+		if (zombiesEncoutered == 0)
 			this.messagesToDisplayOnceRaidIsOver.add("No zombies were encoutered");
 		else if (zombiesKilled == 1)
-			this.messagesToDisplayOnceRaidIsOver.add("One lonely zombie was killed");
+			this.messagesToDisplayOnceRaidIsOver.add("One lonely zombie has been killed");
 		else 
 			this.messagesToDisplayOnceRaidIsOver.add(zombiesKilled + " zombies have been killed");
 	}
 	
 	/**
 	 * Gives a chance to every survivor in the raid to scavenge something
-	 * FIXME use scavenging skill
 	 * @return how much food was found
 	 */
 	private int lootArea() {
 		int lootFound = 0;
-		for (@SuppressWarnings("unused") Survivor currentSurvivor : this.raidSettings.getTeam()) {
-			double rand = BitingDeathGame.getRandomProbability();
+		for (Survivor currentSurvivor : this.raidSettings.getTeam()) {
+			final int X = currentSurvivor.getSkills().getScavengingSkill(), MIN = Skills.LEVEL_MIN, MAX = Skills.LEVEL_MAX; 
+			double coeff = 1 + ((X - MIN) / ((double) MAX - MIN));
+			double rand = BitingDeathGame.getRandomProbability() * coeff;
+			if (rand > 1) {
+				rand = 1;
+			}
+			
 			if (rand > 0.75)
 				lootFound += 2;
 			else if (rand > 0.25)
@@ -149,24 +185,52 @@ public class Raid {
 	/**
 	 * Kill the zombies (before looting) and removes them from the zone.
 	 * Survivors may be bitten, but not overwhelmed and eaten. They will still be able to return home with the loot.
+	 * 
 	 * FIXME make it possible to die without returning home, and not "kill all zombies no matter what". Update messages.
+	 * Even one z can "eat" a survivor alone (big neck bite, won't go anywhere)
+	 * Can't get new survivors back if all eaten
+	 * Dead if nbzombies/surv > N ? Does that mean same fate for everyone ?
+	 * Bitten if getProb < N and dead if getProb << N ?
+	 * One dead, still can loot ? must kill them before ?
+	 * notComingBackToBase != dead ? (left, but still alive somewhere, maybe with NPCs))
+	 * two lists : hurtDuringRaid (bitten, maybe rename) and diedDuringRaid ?
+	 * rename chanceofSURVIVingraid ? (bitten != dead)
+	 * kill how many Z ?
+	 * 
+	 * 
+	 * @param zombiesAboutToEncouter the zombies that will be fighting the raiding team
+	 * 
 	 * @return the number of zombies killed
 	 */
-	private int clearArea() {
-		int zombiesAtFirst = this.raidSettings.getDestination().getZombiesLeft();
-		int zombiesKilled;
-		for (Survivor s : this.raidSettings.getTeam()) {
-			if (BitingDeathGame.getRandomProbability() > chancesOfSurvivingTheRaid(s, zombiesAtFirst)) {
-				// Bitten
-				this.survivorsHurtDuringRaid.add(s);
-			} 
+	private int clearArea(int zombiesAboutToEncouter) {
+		int zombiesKilled = 0;
+		List<Survivor> team = this.raidSettings.team;
+		
+		for (int i = 0 ; i < zombiesAboutToEncouter ; i++) {
+			Survivor target = team.get(Math.abs(new Random().nextInt()) % team.size());
+			
+			double zombieAttack = BitingDeathGame.getRandomProbability();
+			
+			boolean targetSaved = false;
+			for (Survivor potentialSaver : team)  { // Possibly the target himself
+				if (potentialSaver.getFightingEfficiency() > zombieAttack) {
+					targetSaved = true;
+				}
+			}
+			
+			if (! targetSaved) {  // Bitten
+				if (! this.survivorsHurtDuringRaid.contains(target)) {
+					this.survivorsHurtDuringRaid.add(target);
+				}
+			}
+			
+			zombiesKilled++;
 		}
-		zombiesKilled = zombiesAtFirst;
 
 		try {
 			this.raidSettings.getDestination().removeZombies(zombiesKilled);
 		} catch (IncoherentNumberException e) {
-			System.err.println("Erreur de code dans Raid#run : le nombre de zombies à supprimer est incohérent");
+			System.err.println("Erreur de code dans Raid#clearArea : le nombre de zombies à supprimer est incohérent");
 			e.printStackTrace();
 		}
 
@@ -198,32 +262,6 @@ public class Raid {
 		}
 	}
 
-	/**
-	 * Return a double between 0 (excluded, we never know =P) and 1 (if there are no zombies), 
-	 * higher if survivor is more likely to survive the raid.
-	 * More people in the team means much higher chances.
-	 * @param survivor His personal attributes might change the deal.
-	 * @param actualZombiesInTheZone The more, the riskier ! Above 100, things are considered the same.
-	 * @return
-	 */
-	private double chancesOfSurvivingTheRaid(Survivor survivor, int actualZombiesInTheZone) {
-		int zombiesUsedInCalculing = actualZombiesInTheZone;
-		double survivingChances;
-		if (actualZombiesInTheZone == 0)
-			survivingChances = 1;
-		else
-		{
-			if (actualZombiesInTheZone > 100)
-				zombiesUsedInCalculing = 100;
-
-			survivingChances = (0.99 / 
-					(zombiesUsedInCalculing / this.raidSettings.getTeam().size())   
-					)
-					* survivor.getFightingEfficiency();
-		}
-
-		return survivingChances;
-	}
 
 	/**
 	 * Add a Survivor to the team.

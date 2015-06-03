@@ -22,7 +22,13 @@ import com.logicalkip.bitingdeath.exceptions.NoWeaponException;
  * 
  * NPC : Limited amount of survivors hiding in every zone. May not want to come along. Personalities. Meta-game to make them fight zombies and possibly die(turn)
  * 
+ * Scout missions with approximative intell. (the more zombies, the less accurate)
+ * 
+ * Limited amount of food per zone (respawn ?)
+ * 
  * Z attacking the base (not/hardly spawned ?)
+ * 
+ * Choice (when)to end a bitten survivor's life. Turning in the base if not done quick enough. What if no weapons available ^^ ?
  * 
  * Strategies/philosophies to choose and to follow : come back if there are too many Z/get in there no matter what, etc (Strategy design pattern)
  * 
@@ -185,6 +191,13 @@ public class BitingDeathGame {
 									" was put out of " +
 									(poorBastard.isFemale() ? "her" : "his") + " misery."
 					);
+			
+			// Get weapon back (if any)
+			if (poorBastard.getWeapon() != null) {
+				this.mainBase.getAvailableWeapons().add(poorBastard.getWeapon());
+				poorBastard.setWeapon(null);
+			}
+
 			this.removeSurvivorFromGame(poorBastard);
 		}
 		

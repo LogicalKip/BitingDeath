@@ -59,8 +59,6 @@ public class SurvivorsManagingDialog extends JDialog {
 		
 		GridBagConstraints c = new GridBagConstraints();
 		
-		//TODO borders
-		
 		/* Survivors names + radio buttons */
 		c.gridx = 0;
 		c.gridy = 0;
@@ -190,8 +188,9 @@ public class SurvivorsManagingDialog extends JDialog {
 			
 			line++;
 		}
+		this.availableWeaponsPanel.setVisible(this.game.getMainBase().getAvailableWeapons().size() > 0);
 	}
-	
+
 	private void updateSkillsLevel() {
 		try {
 			this.fightLevel.setText(   String.valueOf(this.getSelectedSurvivor().getSkills().getFightingSkill()));
@@ -231,7 +230,7 @@ public class SurvivorsManagingDialog extends JDialog {
 		throw new NoSurvivorSelectedException();
 	}
 	
-	/**
+	/** 
 	 * Makes the currently selected survivor equip a weapon in the displayed list.
 	 * Removes the weapon from the logical list and stores the previously equipped one (if any)
 	 * @param idWeapon the index of the weapon in the displayed list

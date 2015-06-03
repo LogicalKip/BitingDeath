@@ -140,7 +140,7 @@ public class Map {
 						this.zones[x][y].adjustZombieNumber(zombiesAddedAfterRoaming[x][y]);
 					} 
 					catch (IncoherentNumberException e) {
-						System.out.println("Erreur de code dans Map/randomZombieRoaming : Nombre de zombies incohérent");
+						System.err.println("Erreur de code dans Map/randomZombieRoaming : Nombre de zombies incohérent");
 						e.printStackTrace();
 					}
 				}
@@ -156,7 +156,7 @@ public class Map {
 	/**
 	 * @return a specific zone in the map
 	 * @param x 0 <= x < width or else exception
-	 * @param y 0 <= y < heigth or else exception
+	 * @param y 0 <= y < height or else exception
 	 */
 	public Zone getZone(int x, int y) throws OutOfBoundsException{
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height)
@@ -193,8 +193,4 @@ public class Map {
 	public void setHeight(int height) {
 		this.height = height;
 	}
-	
-	
-	
-	
 }
